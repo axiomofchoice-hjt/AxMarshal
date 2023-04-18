@@ -1,0 +1,17 @@
+enum Calc {
+    Add,
+    Sub,
+    Mul,
+    Div,
+}
+
+enum Result {
+    Ok,
+    Err(int),
+}
+
+class User {
+    id: int,
+    follows: List<int>,
+    state: Result,
+}

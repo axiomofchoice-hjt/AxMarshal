@@ -30,11 +30,11 @@ void File::write(const std::string &content) const {
     fclose(f);
 }
 
-std::string File::typeName() const {
+std::string File::ext_name() const {
     return path.substr(path.rfind('.') + 1, std::string::npos);
 }
 
-std::string File::baseName() const {
+std::string File::base_name() const {
     size_t pos = 0;
     for (size_t i = 0; i < path.length(); i++) {
         if (path[i] == '/' || path[i] == '\\') {

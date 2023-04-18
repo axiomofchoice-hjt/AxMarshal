@@ -11,6 +11,6 @@ class File {
     std::string read() const;
     void write(const std::string &content) const;
 
-    std::string typeName() const;
-    std::string baseName() const;
+    std::string ext_name() const;
+    std::string base_name() const;
 };

@@ -1,5 +1,7 @@
 #include "SrcGen.h"
 
+#include "BackEnd.h"
+
 namespace BackEnd {
 std::string SrcGen::__template_string() {
     return R"__template__(
@@ -157,5 +159,15 @@ void __to_json(std::string &res, const {{ name }} &object) {
 }
 {% endif %}
 )__template__";
+}
+
+std::string SrcGen::gen(const BackEnd &back_end) {
+    std::string res;
+    res += "#include \"" + back_end.file_name + ".h\"\n\n";
+
+    for (const FrontEnd::Block &block : back_end.blocks) {
+        res += inja::render(SrcGen::__template_string(), block.json());
+    }
+    return res;
 }
 }  // namespace BackEnd

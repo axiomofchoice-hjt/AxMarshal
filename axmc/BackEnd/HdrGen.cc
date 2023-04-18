@@ -1,5 +1,7 @@
 #include "HdrGen.h"
 
+#include "BackEnd.h"
+
 namespace BackEnd {
 std::string HdrGen::__template_string() {
     return R"__template__(
@@ -79,5 +81,18 @@ class {{ name }} {
 };
 {% endif %}
 )__template__";
+}
+
+std::string HdrGen::gen(const BackEnd &back_end) {
+    std::string res;
+    res += "#pragma once\n\n";
+    res += "#include \"axm/axm.h\"\n\n";
+    res += "#include <string>\n";
+    res += "#include <vector>\n";
+    res += "#include <variant>\n";
+    for (const FrontEnd::Block &block : back_end.blocks) {
+        res += inja::render(HdrGen::__template_string(), block.json());
+    }
+    return res;
 }
 }  // namespace BackEnd

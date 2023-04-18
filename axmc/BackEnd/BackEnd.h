@@ -6,13 +6,12 @@
 #include "../FrontEnd/FrontEnd.h"
 
 namespace BackEnd {
-class CodeGenerator {
+class BackEnd {
    public:
-    // size_t indent;
+    std::string file_name;
     std::vector<FrontEnd::Block> blocks;
 
-    CodeGenerator(const std::vector<FrontEnd::Block> &blocks);
-    std::string header();
-    std::string source(const std::string &baseName);
+    BackEnd(const std::string &file_name,
+            const std::vector<FrontEnd::Block> &blocks);
 };
 }  // namespace BackEnd

@@ -14,6 +14,8 @@ class User {
     id: int,
     name: string,
     gender: char,
+    online: bool,
+    score: float,
     follows: List<int>,
     state: Result,
 }

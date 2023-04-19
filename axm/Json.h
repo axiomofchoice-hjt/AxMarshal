@@ -11,6 +11,7 @@ namespace axm {
 namespace detail {
 using rapidjson::Document;
 using rapidjson::Value;
+Value __to_rapidjson(const bool &, Document::AllocatorType &);
 Value __to_rapidjson(const char &, Document::AllocatorType &);
 Value __to_rapidjson(const uint8_t &, Document::AllocatorType &);
 Value __to_rapidjson(const uint32_t &, Document::AllocatorType &);
@@ -18,6 +19,8 @@ Value __to_rapidjson(const uint64_t &, Document::AllocatorType &);
 Value __to_rapidjson(const int8_t &, Document::AllocatorType &);
 Value __to_rapidjson(const int32_t &, Document::AllocatorType &);
 Value __to_rapidjson(const int64_t &, Document::AllocatorType &);
+Value __to_rapidjson(const float &, Document::AllocatorType &);
+Value __to_rapidjson(const double &, Document::AllocatorType &);
 Value __to_rapidjson(const std::string &, Document::AllocatorType &);
 template <typename T>
 Value __to_rapidjson(const std::vector<T> &data,

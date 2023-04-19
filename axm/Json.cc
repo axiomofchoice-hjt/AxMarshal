@@ -4,6 +4,11 @@
 
 namespace axm {
 namespace detail {
+Value __to_rapidjson(const bool &data, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetBool(data);
+    return v;
+}
 Value __to_rapidjson(const char &data, Document::AllocatorType &allocator) {
     Value v;
     char buffer[2] = {data, 0};
@@ -34,6 +39,16 @@ Value __to_rapidjson(const int32_t &data, Document::AllocatorType &allocator) {
 Value __to_rapidjson(const int64_t &data, Document::AllocatorType &allocator) {
     Value v;
     v.SetInt64(data);
+    return v;
+}
+Value __to_rapidjson(const float &data, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetFloat(data);
+    return v;
+}
+Value __to_rapidjson(const double &data, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetDouble(data);
     return v;
 }
 Value __to_rapidjson(const std::string &data,

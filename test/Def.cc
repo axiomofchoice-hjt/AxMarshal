@@ -305,6 +305,8 @@ User::User():
     id(),
     name(),
     gender(),
+    online(),
+    score(),
     follows(),
     state()
     {}
@@ -314,6 +316,8 @@ void __to_binary(bytes &res, const User &object) {
     __to_binary(res, object.id);
     __to_binary(res, object.name);
     __to_binary(res, object.gender);
+    __to_binary(res, object.online);
+    __to_binary(res, object.score);
     __to_binary(res, object.follows);
     __to_binary(res, object.state);
 }
@@ -321,6 +325,8 @@ void __from_binary(bytes_iter &it, User &object) {
     __from_binary(it, object.id);
     __from_binary(it, object.name);
     __from_binary(it, object.gender);
+    __from_binary(it, object.online);
+    __from_binary(it, object.score);
     __from_binary(it, object.follows);
     __from_binary(it, object.state);
 }
@@ -330,6 +336,8 @@ Value __to_rapidjson(const User &object, Document::AllocatorType &allocator) {
     v.AddMember("id", __to_rapidjson(object.id, allocator), allocator);
     v.AddMember("name", __to_rapidjson(object.name, allocator), allocator);
     v.AddMember("gender", __to_rapidjson(object.gender, allocator), allocator);
+    v.AddMember("online", __to_rapidjson(object.online, allocator), allocator);
+    v.AddMember("score", __to_rapidjson(object.score, allocator), allocator);
     v.AddMember("follows", __to_rapidjson(object.follows, allocator), allocator);
     v.AddMember("state", __to_rapidjson(object.state, allocator), allocator);
     return v;

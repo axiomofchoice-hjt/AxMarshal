@@ -164,6 +164,12 @@ class User {
         char gender;
     
     
+        bool online;
+    
+    
+        float score;
+    
+    
         std::vector<int> follows;
     
     

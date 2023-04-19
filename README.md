@@ -43,6 +43,8 @@ class User {
     id: int,
     name: string,
     gender: char,
+    online: bool,
+    score: float,
     follows: List<int>,
     state: Result,
 }
@@ -56,6 +58,8 @@ class User {
     int id;
     std::string name;
     char gender;
+    bool online;
+    float score;
     std::vector<int> follows;
     Result result;
 };

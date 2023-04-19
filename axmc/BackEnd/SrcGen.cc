@@ -105,23 +105,26 @@ void __from_binary(bytes_iter &it, {{ name }} &object) {
             break;
     }
 }
-void __to_json(std::string &res, const {{ name }} &object) {
-    res += '{';
+Value __to_rapidjson(const {{ name }} &object, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetObject();
     switch (object.__get_tag()) {
 ## for i in elements
         case {{ name }}::__Tag::{{ i.key }}:
-            res += "\"{{ i.key }}\":";
+            v.AddMember("{{ i.key }}",
             {% if i.hasValue %}
-                __to_json(res, object.__get_value<{{ name }}::__Tag::{{ i.key }}>());
+                __to_rapidjson(object.__get_value<{{ name }}::__Tag::{{ i.key }}>(), allocator)
             {% else %}
-                res += "null";
-                break;
-            {% endif %}
+                Value().Move()
+            {% endif%}
+            , allocator
+            );
+            break;
 ## endfor
         default:
             break;
     }
-    res += '}';
+    return v;
 }
 }
 }
@@ -143,27 +146,13 @@ void __from_binary(bytes_iter &it, {{ name }} &object) {
     __from_binary(it, object.{{ i.key }});
 ## endfor
 }
-void __to_json(std::string &res, const {{ name }} &object) {
-    res += '{';
+Value __to_rapidjson(const {{ name }} &object, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetObject();
 ## for i in elements
-    res += "\"{{ i.key }}\":";
-    {% if i.isList %}
-        res += '[';
-        bool flag = false;
-        for (const auto &j : object.{{ i.key }}) {
-            if (flag) { res += ','; }
-            flag = true;
-            __to_json(res, j);
-        }
-        res += ']';
-    {% else %}
-        __to_json(res, object.{{ i.key }});
-    {% endif %}
-    {% if not loop.is_last %}
-        res += ',';
-    {% endif %}
+    v.AddMember("{{ i.key }}", __to_rapidjson(object.{{ i.key }}, allocator), allocator);
 ## endfor
-    res += '}';
+    return v;
 }
 }
 }

@@ -124,37 +124,46 @@ void __from_binary(bytes_iter &it, Calc &object) {
             break;
     }
 }
-void __to_json(std::string &res, const Calc &object) {
-    res += '{';
+Value __to_rapidjson(const Calc &object, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetObject();
     switch (object.__get_tag()) {
         case Calc::__Tag::Add:
-            res += "\"Add\":";
+            v.AddMember("Add",
             
-                res += "null";
-                break;
+                Value().Move()
             
+            , allocator
+            );
+            break;
         case Calc::__Tag::Sub:
-            res += "\"Sub\":";
+            v.AddMember("Sub",
             
-                res += "null";
-                break;
+                Value().Move()
             
+            , allocator
+            );
+            break;
         case Calc::__Tag::Mul:
-            res += "\"Mul\":";
+            v.AddMember("Mul",
             
-                res += "null";
-                break;
+                Value().Move()
             
+            , allocator
+            );
+            break;
         case Calc::__Tag::Div:
-            res += "\"Div\":";
+            v.AddMember("Div",
             
-                res += "null";
-                break;
+                Value().Move()
             
+            , allocator
+            );
+            break;
         default:
             break;
     }
-    res += '}';
+    return v;
 }
 }
 }
@@ -262,24 +271,30 @@ void __from_binary(bytes_iter &it, Result &object) {
             break;
     }
 }
-void __to_json(std::string &res, const Result &object) {
-    res += '{';
+Value __to_rapidjson(const Result &object, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetObject();
     switch (object.__get_tag()) {
         case Result::__Tag::Ok:
-            res += "\"Ok\":";
+            v.AddMember("Ok",
             
-                res += "null";
-                break;
+                Value().Move()
             
+            , allocator
+            );
+            break;
         case Result::__Tag::Err:
-            res += "\"Err\":";
+            v.AddMember("Err",
             
-                __to_json(res, object.__get_value<Result::__Tag::Err>());
+                __to_rapidjson(object.__get_value<Result::__Tag::Err>(), allocator)
             
+            , allocator
+            );
+            break;
         default:
             break;
     }
-    res += '}';
+    return v;
 }
 }
 }
@@ -309,49 +324,15 @@ void __from_binary(bytes_iter &it, User &object) {
     __from_binary(it, object.follows);
     __from_binary(it, object.state);
 }
-void __to_json(std::string &res, const User &object) {
-    res += '{';
-    res += "\"id\":";
-    
-        __to_json(res, object.id);
-    
-    
-        res += ',';
-    
-    res += "\"name\":";
-    
-        __to_json(res, object.name);
-    
-    
-        res += ',';
-    
-    res += "\"gender\":";
-    
-        __to_json(res, object.gender);
-    
-    
-        res += ',';
-    
-    res += "\"follows\":";
-    
-        res += '[';
-        bool flag = false;
-        for (const auto &j : object.follows) {
-            if (flag) { res += ','; }
-            flag = true;
-            __to_json(res, j);
-        }
-        res += ']';
-    
-    
-        res += ',';
-    
-    res += "\"state\":";
-    
-        __to_json(res, object.state);
-    
-    
-    res += '}';
+Value __to_rapidjson(const User &object, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetObject();
+    v.AddMember("id", __to_rapidjson(object.id, allocator), allocator);
+    v.AddMember("name", __to_rapidjson(object.name, allocator), allocator);
+    v.AddMember("gender", __to_rapidjson(object.gender, allocator), allocator);
+    v.AddMember("follows", __to_rapidjson(object.follows, allocator), allocator);
+    v.AddMember("state", __to_rapidjson(object.state, allocator), allocator);
+    return v;
 }
 }
 }

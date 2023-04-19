@@ -1,36 +1,46 @@
 #include "Json.h"
 
+#include <rapidjson/document.h>
+
 namespace axm {
 namespace detail {
-void __to_json(std::string &res, const char &data) {
-    res.reserve(3);
-    res += '"';
-    res += data;
-    res += '"';
+Value __to_rapidjson(const char &data, Document::AllocatorType &allocator) {
+    Value v;
+    char buffer[2] = {data, 0};
+    v.SetString(buffer, 1, allocator);
+    return v;
 }
-void __to_json(std::string &res, const uint8_t &data) {
-    __to_json(res, (uint32_t)data);
+Value __to_rapidjson(const uint8_t &data, Document::AllocatorType &allocator) {
+    return __to_rapidjson((uint32_t)data, allocator);
 }
-void __to_json(std::string &res, const uint32_t &data) {
-    res += std::to_string(data);
+Value __to_rapidjson(const uint32_t &data, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetUint(data);
+    return v;
 }
-void __to_json(std::string &res, const uint64_t &data) {
-    res += std::to_string(data);
+Value __to_rapidjson(const uint64_t &data, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetUint64(data);
+    return v;
 }
-void __to_json(std::string &res, const int8_t &data) {
-    __to_json(res, (int32_t)data);
+Value __to_rapidjson(const int8_t &data, Document::AllocatorType &allocator) {
+    return __to_rapidjson((int32_t)data, allocator);
 }
-void __to_json(std::string &res, const int32_t &data) {
-    res += std::to_string(data);
+Value __to_rapidjson(const int32_t &data, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetInt(data);
+    return v;
 }
-void __to_json(std::string &res, const int64_t &data) {
-    res += std::to_string(data);
+Value __to_rapidjson(const int64_t &data, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetInt64(data);
+    return v;
 }
-void __to_json(std::string &res, const std::string &data) {
-    res.reserve(2 + data.size());
-    res += '"';
-    res += data;
-    res += '"';
+Value __to_rapidjson(const std::string &data,
+                     Document::AllocatorType &allocator) {
+    Value v;
+    v.SetString(data.c_str(), data.size(), allocator);
+    return v;
 }
 }  // namespace detail
 }  // namespace axm

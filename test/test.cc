@@ -3,14 +3,15 @@
 
 #include "Def.h"
 
-#define assert(state)                                        \
-    do {                                                     \
-        if (!(state)) {                                      \
-            printf("assert fail: line=%d\n", __LINE__);      \
-            throw;                                           \
-        } else {                                             \
-            if (0) printf("assert ok: line=%d\n", __LINE__); \
-        }                                                    \
+#undef assert
+#define assert(state)                                             \
+    do {                                                          \
+        if (!(state)) {                                           \
+            printf("assert fail at %s:%d\n", __FILE__, __LINE__); \
+            exit(0);                                              \
+        } else {                                                  \
+            if (0) printf("assert ok: line=%d\n", __LINE__);      \
+        }                                                         \
     } while (false)
 
 void enum_test() {
@@ -76,7 +77,8 @@ void class_test() {
         puts("");
     }
     {
-        User user = axm::from_binary<User>(bin);
+        User user;
+        user = axm::from_binary<User>(bin);
         assert(user.id == 1);
         assert(user.follows.size() == 3);
         assert(user.follows[0] == 2);

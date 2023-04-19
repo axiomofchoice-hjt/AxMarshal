@@ -8,9 +8,10 @@
 static auto header_template_string = R"__template__(
 #pragma once
 
+#include <rapidjson/document.h>
 #include <string>
-#include <vector>
 #include <variant>
+#include <vector>
 
 #include "axm/axm.h"
 )__template__";
@@ -21,7 +22,7 @@ namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const {{ name }} &);
 void __from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &);
-void __to_json(std::string &, const {{ name }} &);
+Value __to_rapidjson(const {{ name }} &, Document::AllocatorType &);
 }
 }
 {% if type == "enum" %}
@@ -74,7 +75,7 @@ class {{ name }} {
     bool operator!=(std::nullptr_t) const;
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const {{ name }} &);
     friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &);
-    friend void axm::detail::__to_json(std::string &, const {{ name }} &);
+    friend rapidjson::Value axm::detail::__to_rapidjson(const {{ name }} &, rapidjson::Document::AllocatorType &);
 };
 {% else if type == "class" %}
 class {{ name }} {
@@ -89,7 +90,7 @@ class {{ name }} {
     {{ name }}();
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const {{ name }} &);
     friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &);
-    friend void axm::detail::__to_json(std::string &, const {{ name }} &);
+    friend rapidjson::Value axm::detail::__to_rapidjson(const {{ name }} &, rapidjson::Document::AllocatorType &);
 };
 {% endif %}
 )__template__";

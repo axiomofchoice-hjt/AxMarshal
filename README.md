@@ -41,17 +41,21 @@ enum Result {
 ```text
 class User {
     id: int,
+    name: string,
+    gender: char,
     follows: List<int>,
     state: Result,
 }
 ```
 
-编译后得到（List 将被编译为 `std::vector`）
+编译后得到类似下面的结构
 
 ```cpp
 class User {
    public:
     int id;
+    std::string name;
+    char gender;
     std::vector<int> follows;
     Result result;
 };
@@ -59,7 +63,6 @@ class User {
 
 ## 序列化
 
-- `axm::to_binary(res)` 得到二进制序列化的结果，类型为 `std::vector<uint8_t>`
-- `axm::from_binary<Result>(vec)` 得到二进制反序列化的结果，参数类型是 `std::vector<uint8_t>`，结果类型是 `Result`
-- `axm::to_json(res)` 得到 Json 序列化的结果，类型为 `std::string`
-- `axm::from_json<Result>(str)` 得到 Json 反序列化的结果，参数类型是 `std::string`，结果类型是 `Result`
+- `axm::to_binary(object)` 得到二进制序列化的结果，返回类型 `std::vector<uint8_t>`
+- `axm::from_binary<Result>(bytes)` 得到二进制反序列化的结果，参数类型 `std::vector<uint8_t>`，返回类型 `Result`
+- `axm::to_json(object)` 得到 Json 序列化的结果，返回类型 `std::string`

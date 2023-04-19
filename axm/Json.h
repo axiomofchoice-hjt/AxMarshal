@@ -1,23 +1,43 @@
 #pragma once
 
+#include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
+
 #include <string>
+#include <vector>
 
 namespace axm {
 namespace detail {
-void __to_json(std::string &res, const char &data);
-void __to_json(std::string &res, const uint8_t &data);
-void __to_json(std::string &res, const uint32_t &data);
-void __to_json(std::string &res, const uint64_t &data);
-void __to_json(std::string &res, const int8_t &data);
-void __to_json(std::string &res, const int32_t &data);
-void __to_json(std::string &res, const int64_t &data);
-void __to_json(std::string &res, const std::string &data);
+using rapidjson::Document;
+using rapidjson::Value;
+Value __to_rapidjson(const char &, Document::AllocatorType &);
+Value __to_rapidjson(const uint8_t &, Document::AllocatorType &);
+Value __to_rapidjson(const uint32_t &, Document::AllocatorType &);
+Value __to_rapidjson(const uint64_t &, Document::AllocatorType &);
+Value __to_rapidjson(const int8_t &, Document::AllocatorType &);
+Value __to_rapidjson(const int32_t &, Document::AllocatorType &);
+Value __to_rapidjson(const int64_t &, Document::AllocatorType &);
+Value __to_rapidjson(const std::string &, Document::AllocatorType &);
+template <typename T>
+Value __to_rapidjson(const std::vector<T> &data,
+                     Document::AllocatorType &allocator) {
+    Value v;
+    v.SetArray();
+    for (auto &i : data) {
+        v.PushBack(__to_rapidjson(i, allocator), allocator);
+    }
+    return v;
+}
 template <typename T>
 std::string to_json(const T &__data) {
-    std::string __res;
-    void __to_json(std::string &, const T &);
-    __to_json(__res, __data);
-    return __res;
+    Document doc;
+    Value __to_rapidjson(const T &, Document::AllocatorType &);
+    Value v = __to_rapidjson(__data, doc.GetAllocator());
+    rapidjson::StringBuffer jsonBuffer;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(jsonBuffer);
+    v.Accept(writer);
+    return jsonBuffer.GetString();
 }
 }  // namespace detail
 

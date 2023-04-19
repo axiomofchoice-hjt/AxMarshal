@@ -1,9 +1,10 @@
 
 #pragma once
 
+#include <rapidjson/document.h>
 #include <string>
-#include <vector>
 #include <variant>
+#include <vector>
 
 #include "axm/axm.h"
 
@@ -12,7 +13,7 @@ namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const Calc &);
 void __from_binary(std::vector<uint8_t>::const_iterator &, Calc &);
-void __to_json(std::string &, const Calc &);
+Value __to_rapidjson(const Calc &, Document::AllocatorType &);
 }
 }
 
@@ -76,7 +77,7 @@ class Calc {
     bool operator!=(std::nullptr_t) const;
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const Calc &);
     friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, Calc &);
-    friend void axm::detail::__to_json(std::string &, const Calc &);
+    friend rapidjson::Value axm::detail::__to_rapidjson(const Calc &, rapidjson::Document::AllocatorType &);
 };
 
 
@@ -85,7 +86,7 @@ namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const Result &);
 void __from_binary(std::vector<uint8_t>::const_iterator &, Result &);
-void __to_json(std::string &, const Result &);
+Value __to_rapidjson(const Result &, Document::AllocatorType &);
 }
 }
 
@@ -138,7 +139,7 @@ class Result {
     bool operator!=(std::nullptr_t) const;
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const Result &);
     friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, Result &);
-    friend void axm::detail::__to_json(std::string &, const Result &);
+    friend rapidjson::Value axm::detail::__to_rapidjson(const Result &, rapidjson::Document::AllocatorType &);
 };
 
 
@@ -147,7 +148,7 @@ namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const User &);
 void __from_binary(std::vector<uint8_t>::const_iterator &, User &);
-void __to_json(std::string &, const User &);
+Value __to_rapidjson(const User &, Document::AllocatorType &);
 }
 }
 
@@ -171,6 +172,6 @@ class User {
     User();
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const User &);
     friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, User &);
-    friend void axm::detail::__to_json(std::string &, const User &);
+    friend rapidjson::Value axm::detail::__to_rapidjson(const User &, rapidjson::Document::AllocatorType &);
 };
 

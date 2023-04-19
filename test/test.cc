@@ -63,6 +63,8 @@ void class_test() {
     {
         User user;
         user.id = 1;
+        user.name = "Tom";
+        user.gender = 'M';
         user.follows.push_back(2);
         user.follows.push_back(3);
         user.follows.push_back(4);
@@ -82,6 +84,7 @@ void class_test() {
         assert(user.follows[2] == 4);
         assert(user.state.is_Err());
         assert(user.state.get_Err() == 233);
+        assert(user.gender == 'M');
 
         printf("%s\n", axm::to_json(user).c_str());
     }

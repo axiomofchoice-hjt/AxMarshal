@@ -1,10 +1,11 @@
-#pragma once
 
-#include "axm/axm.h"
+#pragma once
 
 #include <string>
 #include <vector>
 #include <variant>
+
+#include "axm/axm.h"
 
 class Calc;
 namespace axm {
@@ -156,11 +157,18 @@ class User {
         int id;
     
     
+        std::string name;
+    
+    
+        char gender;
+    
+    
         std::vector<int> follows;
     
     
         Result state;
     
+    User();
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const User &);
     friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, User &);
     friend void axm::detail::__to_json(std::string &, const User &);

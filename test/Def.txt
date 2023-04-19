@@ -12,6 +12,8 @@ enum Result {
 
 class User {
     id: int,
+    name: string,
+    gender: char,
     follows: List<int>,
     state: Result,
 }

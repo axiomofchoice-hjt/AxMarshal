@@ -1,5 +1,5 @@
-#include "Def.h"
 
+#include "Def.h"
 
 
 Calc::__Tag Calc::__get_tag() const {
@@ -286,15 +286,26 @@ void __to_json(std::string &res, const Result &object) {
 
 
 
+User::User():
+    id(),
+    name(),
+    gender(),
+    follows(),
+    state()
+    {}
 namespace axm {
 namespace detail {
 void __to_binary(bytes &res, const User &object) {
     __to_binary(res, object.id);
+    __to_binary(res, object.name);
+    __to_binary(res, object.gender);
     __to_binary(res, object.follows);
     __to_binary(res, object.state);
 }
 void __from_binary(bytes_iter &it, User &object) {
     __from_binary(it, object.id);
+    __from_binary(it, object.name);
+    __from_binary(it, object.gender);
     __from_binary(it, object.follows);
     __from_binary(it, object.state);
 }
@@ -303,6 +314,20 @@ void __to_json(std::string &res, const User &object) {
     res += "\"id\":";
     
         __to_json(res, object.id);
+    
+    
+        res += ',';
+    
+    res += "\"name\":";
+    
+        __to_json(res, object.name);
+    
+    
+        res += ',';
+    
+    res += "\"gender\":";
+    
+        __to_json(res, object.gender);
     
     
         res += ',';

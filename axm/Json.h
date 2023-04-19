@@ -4,10 +4,14 @@
 
 namespace axm {
 namespace detail {
+void __to_json(std::string &res, const char &data);
+void __to_json(std::string &res, const uint8_t &data);
 void __to_json(std::string &res, const uint32_t &data);
 void __to_json(std::string &res, const uint64_t &data);
+void __to_json(std::string &res, const int8_t &data);
 void __to_json(std::string &res, const int32_t &data);
 void __to_json(std::string &res, const int64_t &data);
+void __to_json(std::string &res, const std::string &data);
 template <typename T>
 std::string to_json(const T &__data) {
     std::string __res;

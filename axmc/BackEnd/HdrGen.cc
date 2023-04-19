@@ -1,10 +1,21 @@
 #include "HdrGen.h"
 
+#include <inja/inja.hpp>
+#include <nlohmann/json.hpp>
+
 #include "BackEnd.h"
 
-namespace BackEnd {
-std::string HdrGen::__template_string() {
-    return R"__template__(
+static auto header_template_string = R"__template__(
+#pragma once
+
+#include <string>
+#include <vector>
+#include <variant>
+
+#include "axm/axm.h"
+)__template__";
+
+static auto block_template_string = R"__template__(
 class {{ name }};
 namespace axm {
 namespace detail {
@@ -75,23 +86,20 @@ class {{ name }} {
         {{ i.value }} {{ i.key }};
     {% endif %}
 ## endfor
+    {{ name }}();
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const {{ name }} &);
     friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &);
     friend void axm::detail::__to_json(std::string &, const {{ name }} &);
 };
 {% endif %}
 )__template__";
-}
 
-std::string HdrGen::gen(const BackEnd &back_end) {
+namespace BackEnd {
+std::string HdrGen::gen(const nlohmann::json &back_end) {
     std::string res;
-    res += "#pragma once\n\n";
-    res += "#include \"axm/axm.h\"\n\n";
-    res += "#include <string>\n";
-    res += "#include <vector>\n";
-    res += "#include <variant>\n";
-    for (const FrontEnd::Block &block : back_end.blocks) {
-        res += inja::render(HdrGen::__template_string(), block.json());
+    res += inja::render(header_template_string, back_end);
+    for (const auto &block : back_end["blocks"]) {
+        res += inja::render(block_template_string, block);
     }
     return res;
 }

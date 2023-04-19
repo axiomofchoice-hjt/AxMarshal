@@ -25,9 +25,10 @@ void Compile(const std::string &input, std::string output) {
         output.push_back('/');
     }
 
+    auto data = back_end.json();
     File(output + input_file.base_name() + ".h")
-        .write(BackEnd::HdrGen::gen(back_end));
+        .write(BackEnd::HdrGen::gen(data));
     File(output + input_file.base_name() + ".cc")
-        .write(BackEnd::SrcGen::gen(back_end));
+        .write(BackEnd::SrcGen::gen(data));
 }
 }  // namespace Compiler

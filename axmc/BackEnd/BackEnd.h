@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
 
@@ -13,5 +14,6 @@ class BackEnd {
 
     BackEnd(const std::string &file_name,
             const std::vector<FrontEnd::Block> &blocks);
+    nlohmann::json json() const;
 };
 }  // namespace BackEnd

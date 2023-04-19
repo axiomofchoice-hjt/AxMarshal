@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 
+#include "BasicType.h"
 #include "Lexer.h"
 
 static inline void check(bool value, const char *s) {
@@ -23,7 +24,7 @@ nlohmann::json Element::json() const {
     data["key"] = key;
     data["hasValue"] = !value.empty();
     if (!value.empty()) {
-        data["value"] = value;
+        data["value"] = BasicType::translate(value);
     }
     data["isList"] = isList;
     return data;

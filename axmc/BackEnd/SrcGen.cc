@@ -1,10 +1,15 @@
 #include "SrcGen.h"
 
+#include <inja/inja.hpp>
+#include <nlohmann/json.hpp>
+
 #include "BackEnd.h"
 
-namespace BackEnd {
-std::string SrcGen::__template_string() {
-    return R"__template__(
+static auto header_template_string = R"__template__(
+#include "{{ file_name }}.h"
+)__template__";
+
+static auto block_template_string = R"__template__(
 {% if type == "enum" %}
 {{ name }}::__Tag {{ name }}::__get_tag() const {
     return static_cast<__Tag>(__data.index());
@@ -121,6 +126,11 @@ void __to_json(std::string &res, const {{ name }} &object) {
 }
 }
 {% else if type == "class" %}
+{{ name }}::{{ name }}():
+## for i in elements
+    {{ i.key }}(){% if not loop.is_last %},{% endif %}
+## endfor
+    {}
 namespace axm {
 namespace detail {
 void __to_binary(bytes &res, const {{ name }} &object) {
@@ -159,14 +169,14 @@ void __to_json(std::string &res, const {{ name }} &object) {
 }
 {% endif %}
 )__template__";
-}
 
-std::string SrcGen::gen(const BackEnd &back_end) {
+namespace BackEnd {
+std::string SrcGen::gen(const nlohmann::json &back_end) {
     std::string res;
-    res += "#include \"" + back_end.file_name + ".h\"\n\n";
+    res += inja::render(header_template_string, back_end);
 
-    for (const FrontEnd::Block &block : back_end.blocks) {
-        res += inja::render(SrcGen::__template_string(), block.json());
+    for (const nlohmann::json &block : back_end["blocks"]) {
+        res += inja::render(block_template_string, block);
     }
     return res;
 }

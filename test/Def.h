@@ -181,3 +181,24 @@ class User {
     friend rapidjson::Value axm::detail::__to_rapidjson(const User &, rapidjson::Document::AllocatorType &);
 };
 
+
+class VarUint32;
+namespace axm {
+namespace detail {
+void __to_binary(std::vector<uint8_t> &, const VarUint32 &);
+void __from_binary(std::vector<uint8_t>::const_iterator &, VarUint32 &);
+Value __to_rapidjson(const VarUint32 &, Document::AllocatorType &);
+}
+}
+
+class VarUint32 {
+   public:
+    
+        uint32_t value;
+    
+    VarUint32();
+    friend void axm::detail::__to_binary(std::vector<uint8_t> &, const VarUint32 &);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, VarUint32 &);
+    friend rapidjson::Value axm::detail::__to_rapidjson(const VarUint32 &, rapidjson::Document::AllocatorType &);
+};
+

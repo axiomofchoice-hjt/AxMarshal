@@ -7,7 +7,7 @@ using str_iter = std::string::const_iterator;
 
 static inline str_iter match(str_iter s, const std::function<bool(char)> &f) {
     while (f(*s)) {
-        s++;
+        s += 1;
     }
     return s;
 }
@@ -43,6 +43,10 @@ Lexer::Lexer(const std::string &text) {
 Token Lexer::next(str_iter &it) {
     it = match(it, isspace);
     std::string res;
+    while (*it == '/' && it[1] == '/') {
+        it = match(it, [](char c) { return !(c == '\n' || c == '\0'); });
+        it = match(it, isspace);
+    }
     if (*it == '\0') {
         res.clear();
     } else if (isNameChar(*it)) {

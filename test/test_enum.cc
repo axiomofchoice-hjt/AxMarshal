@@ -34,15 +34,12 @@ TEST(enum, Result) {
     EXPECT_TRUE(r.get_Err() == 233);
 
     auto serial = axm::to_binary(r);
-    for (auto i : serial) {
-        printf("%u ", i);
-    }
-    puts("");
+    EXPECT_TRUE((serial == std::vector<uint8_t>{2, 0, 0, 0, 233, 0, 0, 0}));
     auto r2 = axm::from_binary<Result>(serial);
     EXPECT_TRUE(r2.is_Err());
     EXPECT_TRUE(r2.get_Err() == 233);
 
-    printf("%s\n", axm::to_json(Result()).c_str());
-    printf("%s\n", axm::to_json(Result::Ok()).c_str());
-    printf("%s\n", axm::to_json(Result::Err(233)).c_str());
+    EXPECT_TRUE(axm::to_json(Result()) == R"({})");
+    EXPECT_TRUE(axm::to_json(Result::Ok()) == R"({"Ok":null})");
+    EXPECT_TRUE(axm::to_json(Result::Err(233)) == R"({"Err":233})");
 }

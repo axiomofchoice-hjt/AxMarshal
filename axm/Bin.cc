@@ -52,7 +52,7 @@ void __var_to_binary(bytes &res, const uint32_t &data) {
     do {
         res.push_back((tmp >= 0x80 ? 0x80 : 0) | (tmp & 0x7f));
         tmp >>= 7;
-    } while (data > 0);
+    } while (tmp != 0);
 }
 void __var_to_binary(bytes &res, const int32_t &data) {
     int32_t tmp = data;
@@ -60,12 +60,12 @@ void __var_to_binary(bytes &res, const int32_t &data) {
         do {
             res.push_back((tmp >= 0x40 ? 0x80 : 0) | (tmp & 0x7f));
             tmp >>= 7;
-        } while (data > 0);
+        } while (tmp > 0);
     } else {
         do {
             res.push_back((tmp <= ~0x40 ? 0x80 : 0) | (tmp & 0x7f));
             tmp >>= 7;
-        } while (data != -1);
+        } while (tmp != -1);
     }
 }
 

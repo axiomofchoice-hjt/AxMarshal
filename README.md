@@ -45,7 +45,7 @@ class User {
     gender: char,
     online: bool,
     score: float,
-    follows: List<int>,
+    follows: int[],
     state: Result,
 }
 ```

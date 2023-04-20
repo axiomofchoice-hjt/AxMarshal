@@ -68,20 +68,15 @@ void Block::parseClassContent(Lexer::iter &it) {
         check(*it == ":", "class element need `:`");
         it += 1;
 
-        if (*it == "List") {
+        check(it->isName(), "class element type is not allowed");
+        element.value = it->value;
+        it += 1;
+
+        if (*it == "[") {
+            it += 1;
+            check(*it == "]", "list missing `]`");
+            it += 1;
             element.isList = true;
-            it += 1;
-            check(*it == "<", "list missing `<`");
-            it += 1;
-            check(it->isName(), "list need a type");
-            element.value = it->value;
-            it += 1;
-            check(*it == ">", "list missing `>`");
-            it += 1;
-        } else {
-            check(it->isName(), "class element type is not allowed");
-            element.value = it->value;
-            it += 1;
         }
         elements.push_back(element);
 

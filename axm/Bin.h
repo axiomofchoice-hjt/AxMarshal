@@ -21,6 +21,8 @@ void __to_binary(bytes &, const int64_t &);
 void __to_binary(bytes &, const float &);
 void __to_binary(bytes &, const double &);
 void __to_binary(bytes &, const std::string &);
+void __var_to_binary(bytes &, const uint32_t &);
+
 template <typename T>
 void __to_binary(bytes &res, const std::vector<T> &data) {
     __to_binary(res, (uint32_t)data.size());
@@ -28,6 +30,7 @@ void __to_binary(bytes &res, const std::vector<T> &data) {
         __to_binary(res, i);
     }
 }
+
 template <typename T>
 bytes to_binary(const T &object) {
     bytes res;

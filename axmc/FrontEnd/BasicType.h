@@ -1,14 +1,9 @@
 #pragma once
 
-#include <map>
 #include <string>
 
 namespace BasicType {
-class Info {
-   public:
-    const char *name;
-    const char *output;
-};
+bool is_var_types(const std::string &name);
 
 std::string translate(const std::string &name);
 }  // namespace BasicType

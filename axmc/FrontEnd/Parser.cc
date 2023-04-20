@@ -13,11 +13,11 @@ static inline void check(bool value, const char *s) {
 }
 
 namespace FrontEnd {
-Element::Element() : key(), value(), isList(false) {}
-Element::Element(const std::string &key) : key(key), value(), isList(false) {}
+Element::Element() : key(), value(), isList() {}
+Element::Element(const std::string &key) : key(key), value(), isList() {}
 
 Element::Element(const std::string &key, const std::string &value)
-    : key(key), value(value), isList(false) {}
+    : key(key), value(value), isList() {}
 
 nlohmann::json Element::json() const {
     nlohmann::json data;
@@ -27,6 +27,7 @@ nlohmann::json Element::json() const {
         data["value"] = BasicType::translate(value);
     }
     data["isList"] = isList;
+    data["isVar"] = BasicType::is_var_types(value);
     return data;
 }
 

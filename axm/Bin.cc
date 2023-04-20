@@ -1,5 +1,6 @@
 #include "Bin.h"
 
+#include <bit>
 #include <cstdint>
 #include <vector>
 
@@ -34,16 +35,37 @@ void __to_binary(bytes &res, const int64_t &data) {
     __to_binary(res, (uint64_t)data);
 }
 void __to_binary(bytes &res, const float &data) {
-    __to_binary(res, *(const uint32_t *)&data);
+    __to_binary(res, std::bit_cast<uint32_t>(data));
 }
 void __to_binary(bytes &res, const double &data) {
-    __to_binary(res, *(const uint64_t *)&data);
+    __to_binary(res, std::bit_cast<uint64_t>(data));
 }
 void __to_binary(bytes &res, const std::string &data) {
     res.reserve(4 + data.size());
     __to_binary(res, (uint32_t)data.size());
     for (const auto &i : data) {
         __to_binary(res, i);
+    }
+}
+void __var_to_binary(bytes &res, const uint32_t &data) {
+    uint32_t tmp = data;
+    do {
+        res.push_back((tmp >= 0x80 ? 0x80 : 0) | (tmp & 0x7f));
+        tmp >>= 7;
+    } while (data > 0);
+}
+void __var_to_binary(bytes &res, const int32_t &data) {
+    int32_t tmp = data;
+    if (data > 0) {
+        do {
+            res.push_back((tmp >= 0x40 ? 0x80 : 0) | (tmp & 0x7f));
+            tmp >>= 7;
+        } while (data > 0);
+    } else {
+        do {
+            res.push_back((tmp <= ~0x40 ? 0x80 : 0) | (tmp & 0x7f));
+            tmp >>= 7;
+        } while (data != -1);
     }
 }
 

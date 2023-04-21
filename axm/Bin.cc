@@ -2,6 +2,7 @@
 
 #include <bit>
 #include <cstdint>
+#include <typeinfo>
 #include <vector>
 
 namespace axm {
@@ -47,26 +48,34 @@ void __to_binary(bytes &res, const std::string &data) {
         __to_binary(res, i);
     }
 }
-void __var_to_binary(bytes &res, const uint32_t &data) {
-    uint32_t tmp = data;
+template <typename T>
+void __var_u_to_binary(bytes &res, T data) {
+    bool flag;
+    uint32_t index = 0;
     do {
-        res.push_back((tmp >= 0x80 ? 0x80 : 0) | (tmp & 0x7f));
-        tmp >>= 7;
-    } while (tmp != 0);
+        if (index == 8) {
+            res.push_back(data);
+            break;
+        }
+        flag = (data >= 0x80);
+        res.push_back((flag ? 0x80 : 0) | (data & 0x7f));
+        data >>= 7;
+        index++;
+    } while (flag);
+}
+void __var_to_binary(bytes &res, const uint32_t &data) {
+    __var_u_to_binary(res, data);
 }
 void __var_to_binary(bytes &res, const int32_t &data) {
-    int32_t tmp = data;
-    if (data > 0) {
-        do {
-            res.push_back((tmp >= 0x40 ? 0x80 : 0) | (tmp & 0x7f));
-            tmp >>= 7;
-        } while (tmp > 0);
-    } else {
-        do {
-            res.push_back((tmp <= ~0x40 ? 0x80 : 0) | (tmp & 0x7f));
-            tmp >>= 7;
-        } while (tmp != -1);
-    }
+    __var_u_to_binary(
+        res, (data >= 0 ? (uint32_t)data << 1 : ~(uint32_t)data << 1 | 1));
+}
+void __var_to_binary(bytes &res, const uint64_t &data) {
+    __var_u_to_binary(res, data);
+}
+void __var_to_binary(bytes &res, const int64_t &data) {
+    __var_u_to_binary(
+        res, (data >= 0 ? (uint64_t)data << 1 : ~(uint64_t)data << 1 | 1));
 }
 
 void __from_binary(bytes_iter &it, bool &data) {
@@ -114,6 +123,40 @@ void __from_binary(bytes_iter &it, std::string &data) {
     for (auto &i : data) {
         __from_binary(it, i);
     }
+}
+
+template <typename T>
+void __var_u_from_binary(bytes_iter &it, T &data) {
+    bool flag;
+    uint32_t index = 0;
+    data = 0;
+    do {
+        if (index == 8) {
+            data |= (T)*it << (index * 7);
+            it += 1;
+            break;
+        }
+        flag = (*it & 0x80);
+        data |= (T)(*it & 0x7f) << (index * 7);
+        it += 1;
+        index++;
+    } while (flag);
+}
+void __var_from_binary(bytes_iter &it, uint32_t &data) {
+    __var_u_from_binary(it, data);
+}
+void __var_from_binary(bytes_iter &it, int32_t &data) {
+    uint32_t tmp;
+    __var_u_from_binary(it, tmp);
+    data = (tmp & 1 ? ~(tmp >> 1) : tmp >> 1);
+}
+void __var_from_binary(bytes_iter &it, uint64_t &data) {
+    __var_u_from_binary(it, data);
+}
+void __var_from_binary(bytes_iter &it, int64_t &data) {
+    uint64_t tmp;
+    __var_u_from_binary(it, tmp);
+    data = (tmp & 1 ? ~(tmp >> 1) : tmp >> 1);
 }
 }  // namespace detail
 }  // namespace axm

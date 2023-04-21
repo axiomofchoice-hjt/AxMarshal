@@ -19,7 +19,3 @@ class User {
     follows: int[],
     state: Result,
 }
-
-class VarUint32 {
-    value: var_uint32
-}

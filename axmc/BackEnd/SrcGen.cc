@@ -143,7 +143,7 @@ void __to_binary(bytes &res, const {{ name }} &object) {
 }
 void __from_binary(bytes_iter &it, {{ name }} &object) {
 ## for i in elements
-    __from_binary(it, object.{{ i.key }});
+    __{% if i.isVar %}var_{% endif %}from_binary(it, object.{{ i.key }});
 ## endfor
 }
 Value __to_rapidjson(const {{ name }} &object, Document::AllocatorType &allocator) {

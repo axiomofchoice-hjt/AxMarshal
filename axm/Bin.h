@@ -22,6 +22,9 @@ void __to_binary(bytes &, const float &);
 void __to_binary(bytes &, const double &);
 void __to_binary(bytes &, const std::string &);
 void __var_to_binary(bytes &, const uint32_t &);
+void __var_to_binary(bytes &, const int32_t &);
+void __var_to_binary(bytes &, const uint64_t &);
+void __var_to_binary(bytes &, const int64_t &);
 
 template <typename T>
 void __to_binary(bytes &res, const std::vector<T> &data) {
@@ -50,6 +53,10 @@ void __from_binary(bytes_iter &, int64_t &);
 void __from_binary(bytes_iter &, float &);
 void __from_binary(bytes_iter &, double &);
 void __from_binary(bytes_iter &, std::string &);
+void __var_from_binary(bytes_iter &, uint32_t &);
+void __var_from_binary(bytes_iter &, int32_t &);
+void __var_from_binary(bytes_iter &, uint64_t &);
+void __var_from_binary(bytes_iter &, int64_t &);
 template <typename T>
 void __from_binary(bytes_iter &it, std::vector<T> &data) {
     uint32_t size;

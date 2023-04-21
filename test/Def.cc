@@ -345,25 +345,3 @@ Value __to_rapidjson(const User &object, Document::AllocatorType &allocator) {
 }
 }
 
-
-
-VarUint32::VarUint32():
-    value()
-    {}
-namespace axm {
-namespace detail {
-void __to_binary(bytes &res, const VarUint32 &object) {
-    __var_to_binary(res, object.value);
-}
-void __from_binary(bytes_iter &it, VarUint32 &object) {
-    __from_binary(it, object.value);
-}
-Value __to_rapidjson(const VarUint32 &object, Document::AllocatorType &allocator) {
-    Value v;
-    v.SetObject();
-    v.AddMember("value", __to_rapidjson(object.value, allocator), allocator);
-    return v;
-}
-}
-}
-

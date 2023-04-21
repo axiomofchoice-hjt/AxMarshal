@@ -2,11 +2,11 @@
 
 #include <cctype>
 #include <functional>
+#include <limits>
 
 using str_iter = std::string::const_iterator;
 
-static inline str_iter skip_if(str_iter s,
-                                const std::function<bool(char)> &f) {
+static inline str_iter skip_if(str_iter s, const std::function<bool(char)> &f) {
     while (f(*s)) {
         s += 1;
     }
@@ -27,6 +27,16 @@ bool Token::is_name() const {
     return !value.empty() && is_name_char_start(value[0]);
 }
 bool Token::is_eof() const { return value.empty(); }
+bool Token::is_int() const {
+    return std::all_of(value.begin(), value.end(), isdigit);
+}
+uint64_t Token::get_int() const {
+    uint64_t res = 0;
+    for (auto it = value.rbegin(); it != value.rend(); ++it) {
+        res = std::min(Token::UintInvalid, res * 10 + (*it - '0'));
+    }
+    return res;
+}
 bool Token::operator==(const char *s) const { return value == s; }
 bool Token::operator!=(const char *s) const { return value != s; }
 

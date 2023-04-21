@@ -181,3 +181,24 @@ class User {
     friend rapidjson::Value axm::detail::__to_rapidjson(const User &, rapidjson::Document::AllocatorType &);
 };
 
+
+class Array;
+namespace axm {
+namespace detail {
+void __to_binary(std::vector<uint8_t> &, const Array &);
+void __from_binary(std::vector<uint8_t>::const_iterator &, Array &);
+Value __to_rapidjson(const Array &, Document::AllocatorType &);
+}
+}
+
+class Array {
+   public:
+    
+        std::array<int, 4> el;
+    
+    Array();
+    friend void axm::detail::__to_binary(std::vector<uint8_t> &, const Array &);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, Array &);
+    friend rapidjson::Value axm::detail::__to_rapidjson(const Array &, rapidjson::Document::AllocatorType &);
+};
+

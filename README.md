@@ -34,12 +34,12 @@ enum Result {
 - `calc == other_calc` 判断两个 enum 是否相等（只比较类型）
 - `res.get_Err()` 返回携带的数据（类型不安全，请先用 `is_Err()` 判断后再 `get_Err()`）
 
-## class
+## struct
 
 定义类
 
 ```text
-class User {
+struct User {
     id: int,
     name: string,
     gender: char,
@@ -53,8 +53,7 @@ class User {
 编译后得到类似下面的结构
 
 ```cpp
-class User {
-   public:
+struct User {
     int id;
     std::string name;
     char gender;
@@ -72,6 +71,20 @@ class User {
 32 位变长整数序列化后为 1 到 5 字节，64 位序列化后为 1 到 9 字节
 
 整数绝对值越小，序列化后的字节越少
+
+## 数组
+
+仅支持在 struct 里声明
+
+- `T[]` 即变长数组，编译后的类型是 `std::vector<T>`
+- `T[size]`（size 为十进制数字）即定长数组，编译后的类型是 `std::array<T, size>`
+
+```text
+struct Arrays {
+    vec: int[],
+    arr: int[4],
+}
+```
 
 ## 序列化
 

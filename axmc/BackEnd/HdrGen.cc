@@ -37,7 +37,7 @@ class {{ name }} {
     using __Data = std::variant<
         std::monostate,
 ## for i in elements
-        {% if i.hasValue %}{{ i.value }}
+        {% if i.has_value %}{{ i.value }}
         {% else %}std::monostate
         {% endif %}
         {% if not loop.is_last %},{% endif %}
@@ -61,9 +61,9 @@ class {{ name }} {
     {{ name }} &operator=({{ name }} &&other);
     {{ name }} &operator=(std::nullptr_t);
 ## for i in elements
-    static {{ name }} {{ i.key }}({% if i.hasValue %}{{ i.value }}{% endif %});
+    static {{ name }} {{ i.key }}({% if i.has_value %}{{ i.value }}{% endif %});
     bool is_{{ i.key }}() const;
-    {% if i.hasValue %}
+    {% if i.has_value %}
         const {{ i.value }} &get_{{ i.key }}() const;
         {{ i.value }} &get_{{ i.key }}();
     {% endif %}
@@ -77,12 +77,14 @@ class {{ name }} {
     friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &);
     friend rapidjson::Value axm::detail::__to_rapidjson(const {{ name }} &, rapidjson::Document::AllocatorType &);
 };
-{% else if type == "class" %}
+{% else if type == "struct" %}
 class {{ name }} {
    public:
 ## for i in elements
-    {% if i.is_list %}
+    {% if i.is_vector %}
         std::vector<{{ i.value }}> {{ i.key }};
+    {% else if i.is_array %}
+        std::array<{{i.value}}, {{ i.array_size}}> {{ i.key }};
     {% else %}
         {{ i.value }} {{ i.key }};
     {% endif %}

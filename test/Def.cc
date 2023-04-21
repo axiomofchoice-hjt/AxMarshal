@@ -345,3 +345,25 @@ Value __to_rapidjson(const User &object, Document::AllocatorType &allocator) {
 }
 }
 
+
+
+Array::Array():
+    el()
+    {}
+namespace axm {
+namespace detail {
+void __to_binary(bytes &res, const Array &object) {
+    __to_binary(res, object.el);
+}
+void __from_binary(bytes_iter &it, Array &object) {
+    __from_binary(it, object.el);
+}
+Value __to_rapidjson(const Array &object, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetObject();
+    v.AddMember("el", __to_rapidjson(object.el, allocator), allocator);
+    return v;
+}
+}
+}
+

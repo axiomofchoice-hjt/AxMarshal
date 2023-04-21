@@ -13,25 +13,29 @@ static inline void check(bool value, const char *s) {
 }
 
 namespace FrontEnd {
-Element::Element() : key(), value(), is_list() {}
-Element::Element(const std::string &key) : key(key), value(), is_list() {}
+Element::Element() : key(), value(), is_vector() {}
+Element::Element(const std::string &key) : key(key), value(), is_vector() {}
 
 Element::Element(const std::string &key, const std::string &value)
-    : key(key), value(value), is_list() {}
+    : key(key), value(value), is_vector() {}
 
 nlohmann::json Element::json() const {
     nlohmann::json data;
     data["key"] = key;
-    data["hasValue"] = !value.empty();
+    data["has_value"] = !value.empty();
     if (!value.empty()) {
         data["value"] = BasicType::translate(value);
     }
-    data["is_list"] = is_list;
+    data["is_vector"] = is_vector;
+    data["is_array"] = is_array;
+    if (is_array) {
+        data["array_size"] = array_size;
+    }
     data["is_var"] = BasicType::is_var_types(value);
     return data;
 }
 
-void Block::parseEnumContent(Lexer::iter &it) {
+void Block::parse_enum_inner(Lexer::iter &it) {
     while (*it != "}") {
         Element element;
         check(it->is_name(), "enum element is not allowed");
@@ -52,38 +56,46 @@ void Block::parseEnumContent(Lexer::iter &it) {
         if (*it == "}") {
             break;
         }
-        check(*it == ",", "enum element need `,`");
+        check(*it == "," || *it == ";", "enum element need `,` or `;`");
         it += 1;
     }
 }
 
-void Block::parseClassContent(Lexer::iter &it) {
+void Block::parse_struct_inner(Lexer::iter &it) {
     while (*it != "}") {
         Element element;
 
-        check(it->is_name(), "class element name is not allowed");
+        check(it->is_name(), "struct element name is not allowed");
         element.key = it->value;
         it += 1;
 
-        check(*it == ":", "class element need `:`");
+        check(*it == ":", "struct element need `:`");
         it += 1;
 
-        check(it->is_name(), "class element type is not allowed");
+        check(it->is_name(), "struct element type is not allowed");
         element.value = it->value;
         it += 1;
 
         if (*it == "[") {
             it += 1;
+            if (it->is_int()) {
+                element.is_array = true;
+                element.array_size = it->get_int();
+                it += 1;
+                check(element.array_size != Token::UintInvalid,
+                      "list size is too large");
+            } else {
+                element.is_vector = true;
+            }
             check(*it == "]", "list missing `]`");
             it += 1;
-            element.is_list = true;
         }
         elements.push_back(element);
 
         if (*it == "}") {
             break;
         }
-        check(*it == ",", "class element need `,`");
+        check(*it == "," || *it == ";", "struct element need `,` or `;`");
         it += 1;
     }
 }
@@ -93,8 +105,8 @@ std::vector<Block> Parser(const std::vector<Token> &tokens) {
     std::vector<Block> res;
     while (!it->is_eof()) {
         Block block;
-        check(*it == "enum" || *it == "class",
-              "block should begin with `enum` or `class`");
+        check(*it == "enum" || *it == "struct",
+              "block should begin with `enum` or `struct`");
         block.type = it->value;
         it += 1;
 
@@ -111,9 +123,9 @@ std::vector<Block> Parser(const std::vector<Token> &tokens) {
         }
         check(*rbrace == "}", "block need `}`");
         if (block.type == "enum") {
-            block.parseEnumContent(it);
-        } else if (block.type == "class") {
-            block.parseClassContent(it);
+            block.parse_enum_inner(it);
+        } else if (block.type == "struct") {
+            block.parse_struct_inner(it);
         }
         it += 1;
 

@@ -30,15 +30,15 @@ static auto block_template_string = R"__template__(
     return *this;
 }
 ## for i in elements
-{{ name }} {{ name }}::{{ i.key }}({% if i.hasValue %}{{ i.value }} value{% endif %}) {
+{{ name }} {{ name }}::{{ i.key }}({% if i.has_value %}{{ i.value }} value{% endif %}) {
     {{ name }} res;
-    res.__data = __Data{std::in_place_index<static_cast<size_t>(__Tag::{{ i.key }})>{% if i.hasValue %}, value{% endif %}};
+    res.__data = __Data{std::in_place_index<static_cast<size_t>(__Tag::{{ i.key }})>{% if i.has_value %}, value{% endif %}};
     return res;
 }
 bool {{ name }}::is_{{ i.key }}() const {
     return __get_tag() == __Tag::{{ i.key }};
 }
-{% if i.hasValue %}
+{% if i.has_value %}
 const {{ i.value }} &{{ name }}::get_{{ i.key }}() const {
     return __get_value<__Tag::{{ i.key }}>();
 }
@@ -75,7 +75,7 @@ void __to_binary(bytes &res, const {{ name }} &object) {
     __to_binary(res, (uint32_t)object.__data.index());
     switch (object.__get_tag()) {
 ## for i in elements
-        {% if i.hasValue %}
+        {% if i.has_value %}
             case {{ name }}::__Tag::{{ i.key }}:
                 __{% if i.is_var %}var_{% endif %}to_binary(res, object.__get_value<{{ name }}::__Tag::{{ i.key }}>());
                 break;
@@ -91,7 +91,7 @@ void __from_binary(bytes_iter &it, {{ name }} &object) {
     switch (static_cast<{{ name }}::__Tag>(tag_id)) {
 ## for i in elements
         case {{ name }}::__Tag::{{ i.key }}:
-            {% if i.hasValue %}
+            {% if i.has_value %}
                 {{ i.value }} value;
                 __{% if i.is_var %}var_{% endif %}from_binary(it, value);
                 object.__data = {{ name }}::__Data{std::in_place_index<static_cast<size_t>({{ name }}::__Tag::{{ i.key }})>, std::move(value)};
@@ -112,7 +112,7 @@ Value __to_rapidjson(const {{ name }} &object, Document::AllocatorType &allocato
 ## for i in elements
         case {{ name }}::__Tag::{{ i.key }}:
             v.AddMember("{{ i.key }}",
-            {% if i.hasValue %}
+            {% if i.has_value %}
                 __to_rapidjson(object.__get_value<{{ name }}::__Tag::{{ i.key }}>(), allocator)
             {% else %}
                 Value().Move()
@@ -128,7 +128,7 @@ Value __to_rapidjson(const {{ name }} &object, Document::AllocatorType &allocato
 }
 }
 }
-{% else if type == "class" %}
+{% else if type == "struct" %}
 {{ name }}::{{ name }}():
 ## for i in elements
     {{ i.key }}(){% if not loop.is_last %},{% endif %}

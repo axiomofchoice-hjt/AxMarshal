@@ -12,7 +12,9 @@ class Element {
    public:
     std::string key;
     std::string value;
-    bool is_list;
+    bool is_vector;
+    bool is_array;
+    uint64_t array_size;
     Element();
     explicit Element(const std::string &key);
     Element(const std::string &key, const std::string &value);
@@ -21,12 +23,12 @@ class Element {
 
 class Block {
    public:
-    std::string type;  // "enum" or "class"
+    std::string type;  // "enum" or "struct"
     std::string name;
     std::vector<Element> elements;
 
-    void parseEnumContent(Lexer::iter &it);
-    void parseClassContent(Lexer::iter &it);
+    void parse_enum_inner(Lexer::iter &it);
+    void parse_struct_inner(Lexer::iter &it);
     nlohmann::json json() const;
 };
 

@@ -22,16 +22,31 @@ Value __to_rapidjson(const int64_t &, Document::AllocatorType &);
 Value __to_rapidjson(const float &, Document::AllocatorType &);
 Value __to_rapidjson(const double &, Document::AllocatorType &);
 Value __to_rapidjson(const std::string &, Document::AllocatorType &);
+
 template <typename T>
 Value __to_rapidjson(const std::vector<T> &data,
                      Document::AllocatorType &allocator) {
     Value v;
     v.SetArray();
+    v.Reserve(data.size(), allocator);
     for (auto &i : data) {
         v.PushBack(__to_rapidjson(i, allocator), allocator);
     }
     return v;
 }
+
+template <typename T, size_t Size>
+Value __to_rapidjson(const std::array<T, Size> &data,
+                     Document::AllocatorType &allocator) {
+    Value v;
+    v.SetArray();
+    v.Reserve(Size, allocator);
+    for (auto &i : data) {
+        v.PushBack(__to_rapidjson(i, allocator), allocator);
+    }
+    return v;
+}
+
 template <typename T>
 std::string to_json(const T &__data) {
     Document doc;

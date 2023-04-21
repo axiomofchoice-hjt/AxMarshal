@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <cstdio>
 #include <string>
@@ -34,6 +35,13 @@ void __to_binary(bytes &res, const std::vector<T> &data) {
     }
 }
 
+template <typename T, size_t Size>
+void __to_binary(bytes &res, const std::array<T, Size> &data) {
+    for (const auto &i : data) {
+        __to_binary(res, i);
+    }
+}
+
 template <typename T>
 bytes to_binary(const T &object) {
     bytes res;
@@ -57,6 +65,7 @@ void __var_from_binary(bytes_iter &, uint32_t &);
 void __var_from_binary(bytes_iter &, int32_t &);
 void __var_from_binary(bytes_iter &, uint64_t &);
 void __var_from_binary(bytes_iter &, int64_t &);
+
 template <typename T>
 void __from_binary(bytes_iter &it, std::vector<T> &data) {
     uint32_t size;
@@ -66,6 +75,14 @@ void __from_binary(bytes_iter &it, std::vector<T> &data) {
         __from_binary(it, i);
     }
 }
+
+template <typename T, size_t Size>
+void __from_binary(bytes_iter &it, std::array<T, Size> &data) {
+    for (auto &i : data) {
+        __from_binary(it, i);
+    }
+}
+
 template <typename T>
 T from_binary(const bytes &bin) {
     T res;

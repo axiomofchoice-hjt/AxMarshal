@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "Def.h"
-TEST(class, general) {
+TEST(struct, general) {
     std::vector<uint8_t> bin;
     {
         User user;

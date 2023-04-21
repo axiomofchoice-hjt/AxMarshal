@@ -10,7 +10,7 @@ enum Result {
     Err(int),
 }
 
-class User {
+struct User {
     id: int,
     name: string,
     gender: char,
@@ -18,4 +18,8 @@ class User {
     score: float,
     follows: int[],
     state: Result,
+}
+
+struct Array {
+    el: int[4];
 }

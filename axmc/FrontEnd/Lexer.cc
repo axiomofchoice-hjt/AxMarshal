@@ -5,27 +5,28 @@
 
 using str_iter = std::string::const_iterator;
 
-static inline str_iter match(str_iter s, const std::function<bool(char)> &f) {
+static inline str_iter skip_if(str_iter s,
+                                const std::function<bool(char)> &f) {
     while (f(*s)) {
         s += 1;
     }
     return s;
 }
 
-static inline bool isNameChar(char c) {
+static inline bool is_name_char(char c) {
     return isalnum(c) || c == '_' || c == '$';
 }
 
-static inline bool isNameStartChar(char c) {
+static inline bool is_name_char_start(char c) {
     return isalpha(c) || c == '_' || c == '$';
 }
 
 namespace FrontEnd {
 Token::Token(const std::string &value) : value(value) {}
-bool Token::isName() const {
-    return !value.empty() && isNameStartChar(value[0]);
+bool Token::is_name() const {
+    return !value.empty() && is_name_char_start(value[0]);
 }
-bool Token::isEof() const { return value.empty(); }
+bool Token::is_eof() const { return value.empty(); }
 bool Token::operator==(const char *s) const { return value == s; }
 bool Token::operator!=(const char *s) const { return value != s; }
 
@@ -34,23 +35,23 @@ Lexer::Lexer(const std::string &text) {
     while (true) {
         Token token = Lexer::next(it);
         result.push_back(token);
-        if (token.isEof()) {
+        if (token.is_eof()) {
             break;
         }
     }
 }
 
 Token Lexer::next(str_iter &it) {
-    it = match(it, isspace);
+    it = skip_if(it, isspace);
     std::string res;
     while (*it == '/' && it[1] == '/') {
-        it = match(it, [](char c) { return !(c == '\n' || c == '\0'); });
-        it = match(it, isspace);
+        it = skip_if(it, [](char c) { return !(c == '\n' || c == '\0'); });
+        it = skip_if(it, isspace);
     }
     if (*it == '\0') {
         res.clear();
-    } else if (isNameChar(*it)) {
-        str_iter t = match(it, isNameChar);
+    } else if (is_name_char(*it)) {
+        str_iter t = skip_if(it, is_name_char);
         res.assign(it, t);
         it = t;
     } else {

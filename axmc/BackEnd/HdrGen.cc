@@ -81,7 +81,7 @@ class {{ name }} {
 class {{ name }} {
    public:
 ## for i in elements
-    {% if i.isList %}
+    {% if i.is_list %}
         std::vector<{{ i.value }}> {{ i.key }};
     {% else %}
         {{ i.value }} {{ i.key }};

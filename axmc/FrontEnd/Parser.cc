@@ -13,11 +13,11 @@ static inline void check(bool value, const char *s) {
 }
 
 namespace FrontEnd {
-Element::Element() : key(), value(), isList() {}
-Element::Element(const std::string &key) : key(key), value(), isList() {}
+Element::Element() : key(), value(), is_list() {}
+Element::Element(const std::string &key) : key(key), value(), is_list() {}
 
 Element::Element(const std::string &key, const std::string &value)
-    : key(key), value(value), isList() {}
+    : key(key), value(value), is_list() {}
 
 nlohmann::json Element::json() const {
     nlohmann::json data;
@@ -26,21 +26,21 @@ nlohmann::json Element::json() const {
     if (!value.empty()) {
         data["value"] = BasicType::translate(value);
     }
-    data["isList"] = isList;
-    data["isVar"] = BasicType::is_var_types(value);
+    data["is_list"] = is_list;
+    data["is_var"] = BasicType::is_var_types(value);
     return data;
 }
 
 void Block::parseEnumContent(Lexer::iter &it) {
     while (*it != "}") {
         Element element;
-        check(it->isName(), "enum element is not allowed");
+        check(it->is_name(), "enum element is not allowed");
         element.key = it->value;
         it += 1;
 
         if (*it == "(") {
             it += 1;
-            if (it->isName()) {
+            if (it->is_name()) {
                 element.value = it->value;
                 it += 1;
             }
@@ -61,14 +61,14 @@ void Block::parseClassContent(Lexer::iter &it) {
     while (*it != "}") {
         Element element;
 
-        check(it->isName(), "class element name is not allowed");
+        check(it->is_name(), "class element name is not allowed");
         element.key = it->value;
         it += 1;
 
         check(*it == ":", "class element need `:`");
         it += 1;
 
-        check(it->isName(), "class element type is not allowed");
+        check(it->is_name(), "class element type is not allowed");
         element.value = it->value;
         it += 1;
 
@@ -76,7 +76,7 @@ void Block::parseClassContent(Lexer::iter &it) {
             it += 1;
             check(*it == "]", "list missing `]`");
             it += 1;
-            element.isList = true;
+            element.is_list = true;
         }
         elements.push_back(element);
 
@@ -91,14 +91,14 @@ void Block::parseClassContent(Lexer::iter &it) {
 std::vector<Block> Parser(const std::vector<Token> &tokens) {
     auto it = tokens.cbegin();
     std::vector<Block> res;
-    while (!it->isEof()) {
+    while (!it->is_eof()) {
         Block block;
         check(*it == "enum" || *it == "class",
               "block should begin with `enum` or `class`");
         block.type = it->value;
         it += 1;
 
-        check(it->isName(), "block need a name");
+        check(it->is_name(), "block need a name");
         block.name = it->value;
         it += 1;
 
@@ -106,7 +106,7 @@ std::vector<Block> Parser(const std::vector<Token> &tokens) {
         it += 1;
 
         auto rbrace = it;
-        while (!rbrace->isEof() && *rbrace != "}") {
+        while (!rbrace->is_eof() && *rbrace != "}") {
             rbrace += 1;
         }
         check(*rbrace == "}", "block need `}`");

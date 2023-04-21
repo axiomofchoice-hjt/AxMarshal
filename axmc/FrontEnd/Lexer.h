@@ -9,8 +9,8 @@ class Token {
     std::string value;
 
     explicit Token(const std::string &value);
-    bool isName() const;
-    bool isEof() const;
+    bool is_name() const;
+    bool is_eof() const;
     bool operator==(const char *) const;
     bool operator!=(const char *) const;
 };

@@ -12,7 +12,7 @@ class Element {
    public:
     std::string key;
     std::string value;
-    bool isList;
+    bool is_list;
     Element();
     explicit Element(const std::string &key);
     Element(const std::string &key, const std::string &value);

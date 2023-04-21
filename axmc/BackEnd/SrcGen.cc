@@ -77,7 +77,7 @@ void __to_binary(bytes &res, const {{ name }} &object) {
 ## for i in elements
         {% if i.hasValue %}
             case {{ name }}::__Tag::{{ i.key }}:
-                __{% if i.isVar %}var_{% endif %}to_binary(res, object.__get_value<{{ name }}::__Tag::{{ i.key }}>());
+                __{% if i.is_var %}var_{% endif %}to_binary(res, object.__get_value<{{ name }}::__Tag::{{ i.key }}>());
                 break;
         {% endif %}
 ## endfor
@@ -93,7 +93,7 @@ void __from_binary(bytes_iter &it, {{ name }} &object) {
         case {{ name }}::__Tag::{{ i.key }}:
             {% if i.hasValue %}
                 {{ i.value }} value;
-                __{% if i.isVar %}var_{% endif %}from_binary(it, value);
+                __{% if i.is_var %}var_{% endif %}from_binary(it, value);
                 object.__data = {{ name }}::__Data{std::in_place_index<static_cast<size_t>({{ name }}::__Tag::{{ i.key }})>, std::move(value)};
             {% else %}
                 object.__data = {{ name }}::__Data{std::in_place_index<static_cast<size_t>({{ name }}::__Tag::{{ i.key }})>};
@@ -138,12 +138,12 @@ namespace axm {
 namespace detail {
 void __to_binary(bytes &res, const {{ name }} &object) {
 ## for i in elements
-    __{% if i.isVar %}var_{% endif %}to_binary(res, object.{{ i.key }});
+    __{% if i.is_var %}var_{% endif %}to_binary(res, object.{{ i.key }});
 ## endfor
 }
 void __from_binary(bytes_iter &it, {{ name }} &object) {
 ## for i in elements
-    __{% if i.isVar %}var_{% endif %}from_binary(it, object.{{ i.key }});
+    __{% if i.is_var %}var_{% endif %}from_binary(it, object.{{ i.key }});
 ## endfor
 }
 Value __to_rapidjson(const {{ name }} &object, Document::AllocatorType &allocator) {

@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <cstdio>
+#include <memory>
 #include <string>
 #include <variant>
 #include <vector>
@@ -39,6 +40,15 @@ template <typename T, size_t Size>
 void __to_binary(bytes &res, const std::array<T, Size> &data) {
     for (const auto &i : data) {
         __to_binary(res, i);
+    }
+}
+
+template <typename T>
+void __to_binary(bytes &res, const std::unique_ptr<T> &data) {
+    __to_binary(res, data != nullptr);
+    if (data != nullptr) {
+        void __to_binary(bytes &, const T &);
+        __to_binary(res, *data);
     }
 }
 
@@ -80,6 +90,19 @@ template <typename T, size_t Size>
 void __from_binary(bytes_iter &it, std::array<T, Size> &data) {
     for (auto &i : data) {
         __from_binary(it, i);
+    }
+}
+
+template <typename T>
+void __from_binary(bytes_iter &it, std::unique_ptr<T> &data) {
+    bool tmp;
+    __from_binary(it, tmp);
+    if (tmp) {
+        data = std::make_unique<T>();
+        void __from_binary(bytes_iter &, T &data);
+        __from_binary(it, *data);
+    } else {
+        data = nullptr;
     }
 }
 

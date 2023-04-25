@@ -14,6 +14,7 @@ class Element {
     std::string value;
     bool is_vector;
     bool is_array;
+    bool is_pointer;
     uint64_t array_size;
     Element();
     explicit Element(const std::string &key);

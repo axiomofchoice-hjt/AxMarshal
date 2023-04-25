@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <memory>
 #include <rapidjson/document.h>
 #include <string>
 #include <variant>
@@ -9,6 +10,11 @@
 #include "axm/axm.h"
 
 class Calc;
+class Result;
+class User;
+class Array;
+class Linked;
+
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const Calc &);
@@ -81,7 +87,6 @@ class Calc {
 };
 
 
-class Result;
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const Result &);
@@ -143,7 +148,6 @@ class Result {
 };
 
 
-class User;
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const User &);
@@ -182,7 +186,6 @@ class User {
 };
 
 
-class Array;
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const Array &);
@@ -200,5 +203,28 @@ class Array {
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const Array &);
     friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, Array &);
     friend rapidjson::Value axm::detail::__to_rapidjson(const Array &, rapidjson::Document::AllocatorType &);
+};
+
+
+namespace axm {
+namespace detail {
+void __to_binary(std::vector<uint8_t> &, const Linked &);
+void __from_binary(std::vector<uint8_t>::const_iterator &, Linked &);
+Value __to_rapidjson(const Linked &, Document::AllocatorType &);
+}
+}
+
+class Linked {
+   public:
+    
+        int data;
+    
+    
+        std::unique_ptr<Linked> next;
+    
+    Linked();
+    friend void axm::detail::__to_binary(std::vector<uint8_t> &, const Linked &);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, Linked &);
+    friend rapidjson::Value axm::detail::__to_rapidjson(const Linked &, rapidjson::Document::AllocatorType &);
 };
 

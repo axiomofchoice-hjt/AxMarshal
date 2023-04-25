@@ -8,16 +8,20 @@
 static auto header_template_string = R"__template__(
 #pragma once
 
+#include <memory>
 #include <rapidjson/document.h>
 #include <string>
 #include <variant>
 #include <vector>
 
 #include "axm/axm.h"
+
+## for block in blocks
+class {{ block.name }};
+## endfor
 )__template__";
 
 static auto block_template_string = R"__template__(
-class {{ name }};
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const {{ name }} &);
@@ -84,7 +88,9 @@ class {{ name }} {
     {% if i.is_vector %}
         std::vector<{{ i.value }}> {{ i.key }};
     {% else if i.is_array %}
-        std::array<{{i.value}}, {{ i.array_size}}> {{ i.key }};
+        std::array<{{ i.value }}, {{ i.array_size }}> {{ i.key }};
+    {% else if i.is_pointer %}
+        std::unique_ptr<{{ i.value }}> {{ i.key }};
     {% else %}
         {{ i.value }} {{ i.key }};
     {% endif %}

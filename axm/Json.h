@@ -48,6 +48,19 @@ Value __to_rapidjson(const std::array<T, Size> &data,
 }
 
 template <typename T>
+Value __to_rapidjson(const std::unique_ptr<T> &data,
+                     Document::AllocatorType &allocator) {
+    if (data == nullptr) {
+        Value v;
+        v.SetNull();
+        return v;
+    } else {
+        Value __to_rapidjson(const T &, Document::AllocatorType &);
+        return __to_rapidjson(*data, allocator);
+    }
+}
+
+template <typename T>
 std::string to_json(const T &__data) {
     Document doc;
     Value __to_rapidjson(const T &, Document::AllocatorType &);

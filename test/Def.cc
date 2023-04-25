@@ -367,3 +367,29 @@ Value __to_rapidjson(const Array &object, Document::AllocatorType &allocator) {
 }
 }
 
+
+
+Linked::Linked():
+    data(),
+    next()
+    {}
+namespace axm {
+namespace detail {
+void __to_binary(bytes &res, const Linked &object) {
+    __to_binary(res, object.data);
+    __to_binary(res, object.next);
+}
+void __from_binary(bytes_iter &it, Linked &object) {
+    __from_binary(it, object.data);
+    __from_binary(it, object.next);
+}
+Value __to_rapidjson(const Linked &object, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetObject();
+    v.AddMember("data", __to_rapidjson(object.data, allocator), allocator);
+    v.AddMember("next", __to_rapidjson(object.next, allocator), allocator);
+    return v;
+}
+}
+}
+

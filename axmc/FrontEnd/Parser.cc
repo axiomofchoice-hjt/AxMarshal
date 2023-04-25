@@ -13,11 +13,12 @@ static inline void check(bool value, const char *s) {
 }
 
 namespace FrontEnd {
-Element::Element() : key(), value(), is_vector() {}
-Element::Element(const std::string &key) : key(key), value(), is_vector() {}
+Element::Element() : key(), value(), is_vector(), is_array(), is_pointer() {}
+Element::Element(const std::string &key)
+    : key(key), value(), is_vector(), is_array(), is_pointer() {}
 
 Element::Element(const std::string &key, const std::string &value)
-    : key(key), value(value), is_vector() {}
+    : key(key), value(value), is_vector(), is_array(), is_pointer() {}
 
 nlohmann::json Element::json() const {
     nlohmann::json data;
@@ -28,6 +29,7 @@ nlohmann::json Element::json() const {
     }
     data["is_vector"] = is_vector;
     data["is_array"] = is_array;
+    data["is_pointer"] = is_pointer;
     if (is_array) {
         data["array_size"] = array_size;
     }
@@ -78,17 +80,20 @@ void Block::parse_struct_inner(Lexer::iter &it) {
 
         if (*it == "[") {
             it += 1;
-            if (it->is_int()) {
+            if (it->is_int()) {  // 定长数组
                 element.is_array = true;
                 element.array_size = it->get_int();
                 it += 1;
                 check(element.array_size != Token::UintInvalid,
                       "list size is too large");
-            } else {
+            } else {  // 不定长数组
                 element.is_vector = true;
             }
             check(*it == "]", "list missing `]`");
             it += 1;
+        } else if (*it == "*") {
+            it += 1;
+            element.is_pointer = true;
         }
         elements.push_back(element);
 

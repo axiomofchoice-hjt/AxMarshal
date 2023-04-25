@@ -86,6 +86,21 @@ struct Arrays {
 }
 ```
 
+## 指针
+
+仅支持在 struct 里声明
+
+- `T *` 即指向 T 类型的指针，编译后的类型是 `std::unique_ptr<T>`
+
+利用指针可以实现链表如下
+
+```text
+struct Linked {
+    data: int;
+    next: Linked *;
+}
+```
+
 ## 序列化
 
 - `axm::to_binary(object)` 得到二进制序列化的结果，返回类型 `std::vector<uint8_t>`

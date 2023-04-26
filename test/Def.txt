@@ -28,3 +28,17 @@ struct Linked {
     data: int;
     next: Linked *;
 }
+
+struct A {
+    data: int;
+    next: B *;
+}
+
+struct B {
+    data: int;
+    next: A *;
+}
+enum E {
+    AA(A);
+    BB(B);
+}

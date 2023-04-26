@@ -21,6 +21,7 @@ TEST(pointer, general) {
         l = std::make_unique<Linked>(axm::from_binary<Linked>(bin));
         std::unique_ptr<Linked> *i = &l;
         for (auto data : {1, 2, 3, 4}) {
+            EXPECT_TRUE((*i) != nullptr);
             EXPECT_EQ((*i)->data, data);
             i = &(*i)->next;
         }

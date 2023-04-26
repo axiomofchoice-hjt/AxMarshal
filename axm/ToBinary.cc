@@ -1,4 +1,4 @@
-#include "Bin.h"
+#include "ToBinary.h"
 
 #include <bit>
 #include <cstdint>
@@ -78,85 +78,5 @@ void __var_to_binary(bytes &res, const int64_t &data) {
         res, (data >= 0 ? (uint64_t)data << 1 : ~(uint64_t)data << 1 | 1));
 }
 
-void __from_binary(bytes_iter &it, bool &data) {
-    __from_binary(it, (uint8_t &)data);
-}
-void __from_binary(bytes_iter &it, char &data) {
-    __from_binary(it, (uint8_t &)data);
-}
-void __from_binary(bytes_iter &it, uint8_t &data) {
-    data = *it;
-    ++it;
-}
-void __from_binary(bytes_iter &it, uint32_t &data) {
-    data = uint32_t(*it) | uint32_t(*(it + 1)) << 8 |
-           uint32_t(*(it + 2)) << 16 | uint32_t(*(it + 3)) << 24;
-    it += 4;
-}
-void __from_binary(bytes_iter &it, uint64_t &data) {
-    data = 0;
-    uint32_t tmp;
-    __from_binary(it, tmp);
-    data |= tmp;
-    __from_binary(it, tmp);
-    data |= uint64_t(tmp) << 32;
-}
-void __from_binary(bytes_iter &it, int8_t &data) {
-    __from_binary(it, (uint8_t &)data);
-}
-void __from_binary(bytes_iter &it, int32_t &data) {
-    __from_binary(it, (uint32_t &)data);
-}
-void __from_binary(bytes_iter &it, int64_t &data) {
-    __from_binary(it, (uint64_t &)data);
-}
-void __from_binary(bytes_iter &it, float &data) {
-    __from_binary(it, (uint32_t &)data);
-}
-void __from_binary(bytes_iter &it, double &data) {
-    __from_binary(it, (uint64_t &)data);
-}
-void __from_binary(bytes_iter &it, std::string &data) {
-    uint32_t size;
-    __from_binary(it, size);
-    data.resize(size);
-    for (auto &i : data) {
-        __from_binary(it, i);
-    }
-}
-
-template <typename T>
-void __var_u_from_binary(bytes_iter &it, T &data) {
-    bool flag;
-    uint32_t index = 0;
-    data = 0;
-    do {
-        if (index == 8) {
-            data |= (T)*it << (index * 7);
-            it += 1;
-            break;
-        }
-        flag = (*it & 0x80);
-        data |= (T)(*it & 0x7f) << (index * 7);
-        it += 1;
-        index++;
-    } while (flag);
-}
-void __var_from_binary(bytes_iter &it, uint32_t &data) {
-    __var_u_from_binary(it, data);
-}
-void __var_from_binary(bytes_iter &it, int32_t &data) {
-    uint32_t tmp;
-    __var_u_from_binary(it, tmp);
-    data = (tmp & 1 ? ~(tmp >> 1) : tmp >> 1);
-}
-void __var_from_binary(bytes_iter &it, uint64_t &data) {
-    __var_u_from_binary(it, data);
-}
-void __var_from_binary(bytes_iter &it, int64_t &data) {
-    uint64_t tmp;
-    __var_u_from_binary(it, tmp);
-    data = (tmp & 1 ? ~(tmp >> 1) : tmp >> 1);
-}
 }  // namespace detail
 }  // namespace axm

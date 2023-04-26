@@ -14,27 +14,44 @@ static auto block_template_string = R"__template__(
 {{ name }}::__Tag {{ name }}::__get_tag() const {
     return static_cast<__Tag>(__data.index());
 }
-{{ name }}::{{ name }}(): __data({}) {}
+{{ name }}::{{ name }}(const __Data &data): __data(data) {}
+{{ name }}::{{ name }}(__Data &&data): __data(std::move(data)) {}
+{{ name }}::{{ name }}(): __data() {}
 {{ name }}::{{ name }}(const {{ name }} &other): __data(other.__data) {}
 {{ name }}::{{ name }}({{ name }} &&other): __data(std::move(other.__data)) {}
 {{ name }} &{{ name }}::operator=(const {{ name }} &other) {
-    __data = other.__data;
+    switch (other.__get_tag()) {
+## for i in elements
+        case __Tag::{{ i.key }}:
+            __data.emplace<static_cast<std::size_t>(__Tag::{{ i.key }})>(other.__get_value<__Tag::{{ i.key }}>());
+            break;
+## endfor
+        default:
+            __data.emplace<0>();
+    }
     return *this;
 }
 {{ name }} &{{ name }}::operator=({{ name }} &&other) {
-    __data = std::move(other.__data);
+    switch (other.__get_tag()) {
+## for i in elements
+        case __Tag::{{ i.key }}:
+            __data.emplace<static_cast<std::size_t>(__Tag::{{ i.key }})>(std::move(other.__get_value<__Tag::{{ i.key }}>()));
+            break;
+## endfor
+        default:
+            __data.emplace<0>();
+    }
     return *this;
 }
 {{ name }} &{{ name }}::operator=(std::nullptr_t) {
-    __data = __Data{};
+    __data.emplace<0>();
     return *this;
 }
 ## for i in elements
 {{ name }} {{ name }}::{{ i.key }}({% if i.has_value %}{{ i.value }} value{% endif %}) {
-    {{ name }} res;
-    res.__data = __Data{std::in_place_index<static_cast<size_t>(__Tag::{{ i.key }})>{% if i.has_value %}, value{% endif %}};
-    return res;
+    return {{ name }}(__Data{std::in_place_index<static_cast<size_t>(__Tag::{{ i.key }})>{% if i.has_value %}, value{% endif %}});
 }
+{# is_SomeTag #}
 bool {{ name }}::is_{{ i.key }}() const {
     return __get_tag() == __Tag::{{ i.key }};
 }
@@ -85,23 +102,24 @@ void __to_binary(bytes &res, const {{ name }} &object) {
             break;
     }
 }
-void __from_binary(bytes_iter &it, {{ name }} &object) {
+void __from_binary(bytes_iter &it, {{ name }} &object, void *) {
     uint32_t tag_id;
     __from_binary(it, tag_id);
     switch (static_cast<{{ name }}::__Tag>(tag_id)) {
 ## for i in elements
-        case {{ name }}::__Tag::{{ i.key }}:
+        case {{ name }}::__Tag::{{ i.key }}: {
             {% if i.has_value %}
                 {{ i.value }} value;
                 __{% if i.is_var %}var_{% endif %}from_binary(it, value);
-                object.__data = {{ name }}::__Data{std::in_place_index<static_cast<size_t>({{ name }}::__Tag::{{ i.key }})>, std::move(value)};
+                object = {{ name }}({{ name }}::__Data{std::in_place_index<static_cast<size_t>({{ name }}::__Tag::{{ i.key }})>, std::move(value)});
             {% else %}
-                object.__data = {{ name }}::__Data{std::in_place_index<static_cast<size_t>({{ name }}::__Tag::{{ i.key }})>};
+                object = {{ name }}({{ name }}::__Data{std::in_place_index<static_cast<size_t>({{ name }}::__Tag::{{ i.key }})>});
             {% endif %}
                 break;
+        }
 ## endfor
         default:
-            object.__data = {{ name }}::__Data{};
+            object = {{ name }}();
             break;
     }
 }
@@ -129,9 +147,31 @@ Value __to_rapidjson(const {{ name }} &object, Document::AllocatorType &allocato
 }
 }
 {% else if type == "struct" %}
+{{ name }} {{ name }}::__copy() const {
+    {{ name }} res;
+## for i in elements
+    {% if i.is_pointer %}
+        res.{{ i.key }} = std::make_unique<{{ i.value }}>(*{{ i.key }});
+    {% else %}
+        res.{{ i.key }} = {{ i.key }};
+    {% endif %}
+## endfor
+    return res;
+}
 {{ name }}::{{ name }}():
 ## for i in elements
-    {{ i.key }}(){% if not loop.is_last %},{% endif %}
+    {{ i.key }}()
+    {% if not loop.is_last %},{% endif %}
+## endfor
+    {}
+{{ name }}::{{ name }}(const {{ name }} &other):
+## for i in elements
+    {% if i.is_pointer %}
+    {{ i.key }}(other.{{ i.key }} == nullptr ? nullptr : std::make_unique<{{ i.value }}>(*other.{{ i.key }}))
+    {% else %}
+    {{ i.key }}(other.{{ i.key }})
+    {% endif %}
+    {% if not loop.is_last %},{% endif %}
 ## endfor
     {}
 namespace axm {
@@ -141,7 +181,7 @@ void __to_binary(bytes &res, const {{ name }} &object) {
     __{% if i.is_var %}var_{% endif %}to_binary(res, object.{{ i.key }});
 ## endfor
 }
-void __from_binary(bytes_iter &it, {{ name }} &object) {
+void __from_binary(bytes_iter &it, {{ name }} &object, void *) {
 ## for i in elements
     __{% if i.is_var %}var_{% endif %}from_binary(it, object.{{ i.key }});
 ## endfor

@@ -25,7 +25,7 @@ static auto block_template_string = R"__template__(
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const {{ name }} &);
-void __from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &);
+void __from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &, void * = nullptr);
 Value __to_rapidjson(const {{ name }} &, Document::AllocatorType &);
 }
 }
@@ -41,9 +41,7 @@ class {{ name }} {
     using __Data = std::variant<
         std::monostate,
 ## for i in elements
-        {% if i.has_value %}{{ i.value }}
-        {% else %}std::monostate
-        {% endif %}
+        {% if i.has_value %}{{ i.value }}{% else %}std::monostate{% endif %}
         {% if not loop.is_last %},{% endif %}
 ## endfor
     >;
@@ -57,6 +55,8 @@ class {{ name }} {
     auto &__get_value() {
         return std::get<static_cast<size_t>(key)>(__data);
     }
+    {{ name }}(const __Data &data);
+    {{ name }}(__Data &&data);
    public:
     {{ name }}();
     {{ name }}(const {{ name }} &);
@@ -78,12 +78,16 @@ class {{ name }} {
     bool operator==(std::nullptr_t) const;
     bool operator!=(std::nullptr_t) const;
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const {{ name }} &);
-    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &, void *);
     friend rapidjson::Value axm::detail::__to_rapidjson(const {{ name }} &, rapidjson::Document::AllocatorType &);
 };
 {% else if type == "struct" %}
 class {{ name }} {
+   private:
+    {{ name }} __copy() const;
    public:
+    {{ name }}();
+    {{ name }}(const {{ name }} &);
 ## for i in elements
     {% if i.is_vector %}
         std::vector<{{ i.value }}> {{ i.key }};
@@ -95,9 +99,8 @@ class {{ name }} {
         {{ i.value }} {{ i.key }};
     {% endif %}
 ## endfor
-    {{ name }}();
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const {{ name }} &);
-    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &, void *);
     friend rapidjson::Value axm::detail::__to_rapidjson(const {{ name }} &, rapidjson::Document::AllocatorType &);
 };
 {% endif %}

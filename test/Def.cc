@@ -5,53 +5,81 @@
 Calc::__Tag Calc::__get_tag() const {
     return static_cast<__Tag>(__data.index());
 }
-Calc::Calc(): __data({}) {}
+Calc::Calc(const __Data &data): __data(data) {}
+Calc::Calc(__Data &&data): __data(std::move(data)) {}
+Calc::Calc(): __data() {}
 Calc::Calc(const Calc &other): __data(other.__data) {}
 Calc::Calc(Calc &&other): __data(std::move(other.__data)) {}
 Calc &Calc::operator=(const Calc &other) {
-    __data = other.__data;
+    switch (other.__get_tag()) {
+        case __Tag::Add:
+            __data.emplace<static_cast<std::size_t>(__Tag::Add)>(other.__get_value<__Tag::Add>());
+            break;
+        case __Tag::Sub:
+            __data.emplace<static_cast<std::size_t>(__Tag::Sub)>(other.__get_value<__Tag::Sub>());
+            break;
+        case __Tag::Mul:
+            __data.emplace<static_cast<std::size_t>(__Tag::Mul)>(other.__get_value<__Tag::Mul>());
+            break;
+        case __Tag::Div:
+            __data.emplace<static_cast<std::size_t>(__Tag::Div)>(other.__get_value<__Tag::Div>());
+            break;
+        default:
+            __data.emplace<0>();
+    }
     return *this;
 }
 Calc &Calc::operator=(Calc &&other) {
-    __data = std::move(other.__data);
+    switch (other.__get_tag()) {
+        case __Tag::Add:
+            __data.emplace<static_cast<std::size_t>(__Tag::Add)>(std::move(other.__get_value<__Tag::Add>()));
+            break;
+        case __Tag::Sub:
+            __data.emplace<static_cast<std::size_t>(__Tag::Sub)>(std::move(other.__get_value<__Tag::Sub>()));
+            break;
+        case __Tag::Mul:
+            __data.emplace<static_cast<std::size_t>(__Tag::Mul)>(std::move(other.__get_value<__Tag::Mul>()));
+            break;
+        case __Tag::Div:
+            __data.emplace<static_cast<std::size_t>(__Tag::Div)>(std::move(other.__get_value<__Tag::Div>()));
+            break;
+        default:
+            __data.emplace<0>();
+    }
     return *this;
 }
 Calc &Calc::operator=(std::nullptr_t) {
-    __data = __Data{};
+    __data.emplace<0>();
     return *this;
 }
 Calc Calc::Add() {
-    Calc res;
-    res.__data = __Data{std::in_place_index<static_cast<size_t>(__Tag::Add)>};
-    return res;
+    return Calc(__Data{std::in_place_index<static_cast<size_t>(__Tag::Add)>});
 }
+
 bool Calc::is_Add() const {
     return __get_tag() == __Tag::Add;
 }
 
 Calc Calc::Sub() {
-    Calc res;
-    res.__data = __Data{std::in_place_index<static_cast<size_t>(__Tag::Sub)>};
-    return res;
+    return Calc(__Data{std::in_place_index<static_cast<size_t>(__Tag::Sub)>});
 }
+
 bool Calc::is_Sub() const {
     return __get_tag() == __Tag::Sub;
 }
 
 Calc Calc::Mul() {
-    Calc res;
-    res.__data = __Data{std::in_place_index<static_cast<size_t>(__Tag::Mul)>};
-    return res;
+    return Calc(__Data{std::in_place_index<static_cast<size_t>(__Tag::Mul)>});
 }
+
 bool Calc::is_Mul() const {
     return __get_tag() == __Tag::Mul;
 }
 
 Calc Calc::Div() {
-    Calc res;
-    res.__data = __Data{std::in_place_index<static_cast<size_t>(__Tag::Div)>};
-    return res;
+    return Calc(__Data{std::in_place_index<static_cast<size_t>(__Tag::Div)>});
 }
+
 bool Calc::is_Div() const {
     return __get_tag() == __Tag::Div;
 }
@@ -95,32 +123,36 @@ void __to_binary(bytes &res, const Calc &object) {
             break;
     }
 }
-void __from_binary(bytes_iter &it, Calc &object) {
+void __from_binary(bytes_iter &it, Calc &object, void *) {
     uint32_t tag_id;
     __from_binary(it, tag_id);
     switch (static_cast<Calc::__Tag>(tag_id)) {
-        case Calc::__Tag::Add:
+        case Calc::__Tag::Add: {
             
-                object.__data = Calc::__Data{std::in_place_index<static_cast<size_t>(Calc::__Tag::Add)>};
-            
-                break;
-        case Calc::__Tag::Sub:
-            
-                object.__data = Calc::__Data{std::in_place_index<static_cast<size_t>(Calc::__Tag::Sub)>};
+                object = Calc(Calc::__Data{std::in_place_index<static_cast<size_t>(Calc::__Tag::Add)>});
             
                 break;
-        case Calc::__Tag::Mul:
+        }
+        case Calc::__Tag::Sub: {
             
-                object.__data = Calc::__Data{std::in_place_index<static_cast<size_t>(Calc::__Tag::Mul)>};
-            
-                break;
-        case Calc::__Tag::Div:
-            
-                object.__data = Calc::__Data{std::in_place_index<static_cast<size_t>(Calc::__Tag::Div)>};
+                object = Calc(Calc::__Data{std::in_place_index<static_cast<size_t>(Calc::__Tag::Sub)>});
             
                 break;
+        }
+        case Calc::__Tag::Mul: {
+            
+                object = Calc(Calc::__Data{std::in_place_index<static_cast<size_t>(Calc::__Tag::Mul)>});
+            
+                break;
+        }
+        case Calc::__Tag::Div: {
+            
+                object = Calc(Calc::__Data{std::in_place_index<static_cast<size_t>(Calc::__Tag::Div)>});
+            
+                break;
+        }
         default:
-            object.__data = Calc::__Data{};
+            object = Calc();
             break;
     }
 }
@@ -173,35 +205,53 @@ Value __to_rapidjson(const Calc &object, Document::AllocatorType &allocator) {
 Result::__Tag Result::__get_tag() const {
     return static_cast<__Tag>(__data.index());
 }
-Result::Result(): __data({}) {}
+Result::Result(const __Data &data): __data(data) {}
+Result::Result(__Data &&data): __data(std::move(data)) {}
+Result::Result(): __data() {}
 Result::Result(const Result &other): __data(other.__data) {}
 Result::Result(Result &&other): __data(std::move(other.__data)) {}
 Result &Result::operator=(const Result &other) {
-    __data = other.__data;
+    switch (other.__get_tag()) {
+        case __Tag::Ok:
+            __data.emplace<static_cast<std::size_t>(__Tag::Ok)>(other.__get_value<__Tag::Ok>());
+            break;
+        case __Tag::Err:
+            __data.emplace<static_cast<std::size_t>(__Tag::Err)>(other.__get_value<__Tag::Err>());
+            break;
+        default:
+            __data.emplace<0>();
+    }
     return *this;
 }
 Result &Result::operator=(Result &&other) {
-    __data = std::move(other.__data);
+    switch (other.__get_tag()) {
+        case __Tag::Ok:
+            __data.emplace<static_cast<std::size_t>(__Tag::Ok)>(std::move(other.__get_value<__Tag::Ok>()));
+            break;
+        case __Tag::Err:
+            __data.emplace<static_cast<std::size_t>(__Tag::Err)>(std::move(other.__get_value<__Tag::Err>()));
+            break;
+        default:
+            __data.emplace<0>();
+    }
     return *this;
 }
 Result &Result::operator=(std::nullptr_t) {
-    __data = __Data{};
+    __data.emplace<0>();
     return *this;
 }
 Result Result::Ok() {
-    Result res;
-    res.__data = __Data{std::in_place_index<static_cast<size_t>(__Tag::Ok)>};
-    return res;
+    return Result(__Data{std::in_place_index<static_cast<size_t>(__Tag::Ok)>});
 }
+
 bool Result::is_Ok() const {
     return __get_tag() == __Tag::Ok;
 }
 
 Result Result::Err(int value) {
-    Result res;
-    res.__data = __Data{std::in_place_index<static_cast<size_t>(__Tag::Err)>, value};
-    return res;
+    return Result(__Data{std::in_place_index<static_cast<size_t>(__Tag::Err)>, value});
 }
+
 bool Result::is_Err() const {
     return __get_tag() == __Tag::Err;
 }
@@ -250,24 +300,26 @@ void __to_binary(bytes &res, const Result &object) {
             break;
     }
 }
-void __from_binary(bytes_iter &it, Result &object) {
+void __from_binary(bytes_iter &it, Result &object, void *) {
     uint32_t tag_id;
     __from_binary(it, tag_id);
     switch (static_cast<Result::__Tag>(tag_id)) {
-        case Result::__Tag::Ok:
+        case Result::__Tag::Ok: {
             
-                object.__data = Result::__Data{std::in_place_index<static_cast<size_t>(Result::__Tag::Ok)>};
+                object = Result(Result::__Data{std::in_place_index<static_cast<size_t>(Result::__Tag::Ok)>});
             
                 break;
-        case Result::__Tag::Err:
+        }
+        case Result::__Tag::Err: {
             
                 int value;
                 __from_binary(it, value);
-                object.__data = Result::__Data{std::in_place_index<static_cast<size_t>(Result::__Tag::Err)>, std::move(value)};
+                object = Result(Result::__Data{std::in_place_index<static_cast<size_t>(Result::__Tag::Err)>, std::move(value)});
             
                 break;
+        }
         default:
-            object.__data = Result::__Data{};
+            object = Result();
             break;
     }
 }
@@ -301,14 +353,76 @@ Value __to_rapidjson(const Result &object, Document::AllocatorType &allocator) {
 
 
 
+User User::__copy() const {
+    User res;
+    
+        res.id = id;
+    
+    
+        res.name = name;
+    
+    
+        res.gender = gender;
+    
+    
+        res.online = online;
+    
+    
+        res.score = score;
+    
+    
+        res.follows = follows;
+    
+    
+        res.state = state;
+    
+    return res;
+}
 User::User():
-    id(),
-    name(),
-    gender(),
-    online(),
-    score(),
-    follows(),
+    id()
+    ,
+    name()
+    ,
+    gender()
+    ,
+    online()
+    ,
+    score()
+    ,
+    follows()
+    ,
     state()
+    
+    {}
+User::User(const User &other):
+    
+    id(other.id)
+    
+    ,
+    
+    name(other.name)
+    
+    ,
+    
+    gender(other.gender)
+    
+    ,
+    
+    online(other.online)
+    
+    ,
+    
+    score(other.score)
+    
+    ,
+    
+    follows(other.follows)
+    
+    ,
+    
+    state(other.state)
+    
+    
     {}
 namespace axm {
 namespace detail {
@@ -321,7 +435,7 @@ void __to_binary(bytes &res, const User &object) {
     __to_binary(res, object.follows);
     __to_binary(res, object.state);
 }
-void __from_binary(bytes_iter &it, User &object) {
+void __from_binary(bytes_iter &it, User &object, void *) {
     __from_binary(it, object.id);
     __from_binary(it, object.name);
     __from_binary(it, object.gender);
@@ -347,15 +461,29 @@ Value __to_rapidjson(const User &object, Document::AllocatorType &allocator) {
 
 
 
+Array Array::__copy() const {
+    Array res;
+    
+        res.el = el;
+    
+    return res;
+}
 Array::Array():
     el()
+    
+    {}
+Array::Array(const Array &other):
+    
+    el(other.el)
+    
+    
     {}
 namespace axm {
 namespace detail {
 void __to_binary(bytes &res, const Array &object) {
     __to_binary(res, object.el);
 }
-void __from_binary(bytes_iter &it, Array &object) {
+void __from_binary(bytes_iter &it, Array &object, void *) {
     __from_binary(it, object.el);
 }
 Value __to_rapidjson(const Array &object, Document::AllocatorType &allocator) {
@@ -369,9 +497,31 @@ Value __to_rapidjson(const Array &object, Document::AllocatorType &allocator) {
 
 
 
+Linked Linked::__copy() const {
+    Linked res;
+    
+        res.data = data;
+    
+    
+        res.next = std::make_unique<Linked>(*next);
+    
+    return res;
+}
 Linked::Linked():
-    data(),
+    data()
+    ,
     next()
+    
+    {}
+Linked::Linked(const Linked &other):
+    
+    data(other.data)
+    
+    ,
+    
+    next(other.next == nullptr ? nullptr : std::make_unique<Linked>(*other.next))
+    
+    
     {}
 namespace axm {
 namespace detail {
@@ -379,7 +529,7 @@ void __to_binary(bytes &res, const Linked &object) {
     __to_binary(res, object.data);
     __to_binary(res, object.next);
 }
-void __from_binary(bytes_iter &it, Linked &object) {
+void __from_binary(bytes_iter &it, Linked &object, void *) {
     __from_binary(it, object.data);
     __from_binary(it, object.next);
 }
@@ -388,6 +538,266 @@ Value __to_rapidjson(const Linked &object, Document::AllocatorType &allocator) {
     v.SetObject();
     v.AddMember("data", __to_rapidjson(object.data, allocator), allocator);
     v.AddMember("next", __to_rapidjson(object.next, allocator), allocator);
+    return v;
+}
+}
+}
+
+
+
+A A::__copy() const {
+    A res;
+    
+        res.data = data;
+    
+    
+        res.next = std::make_unique<B>(*next);
+    
+    return res;
+}
+A::A():
+    data()
+    ,
+    next()
+    
+    {}
+A::A(const A &other):
+    
+    data(other.data)
+    
+    ,
+    
+    next(other.next == nullptr ? nullptr : std::make_unique<B>(*other.next))
+    
+    
+    {}
+namespace axm {
+namespace detail {
+void __to_binary(bytes &res, const A &object) {
+    __to_binary(res, object.data);
+    __to_binary(res, object.next);
+}
+void __from_binary(bytes_iter &it, A &object, void *) {
+    __from_binary(it, object.data);
+    __from_binary(it, object.next);
+}
+Value __to_rapidjson(const A &object, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetObject();
+    v.AddMember("data", __to_rapidjson(object.data, allocator), allocator);
+    v.AddMember("next", __to_rapidjson(object.next, allocator), allocator);
+    return v;
+}
+}
+}
+
+
+
+B B::__copy() const {
+    B res;
+    
+        res.data = data;
+    
+    
+        res.next = std::make_unique<A>(*next);
+    
+    return res;
+}
+B::B():
+    data()
+    ,
+    next()
+    
+    {}
+B::B(const B &other):
+    
+    data(other.data)
+    
+    ,
+    
+    next(other.next == nullptr ? nullptr : std::make_unique<A>(*other.next))
+    
+    
+    {}
+namespace axm {
+namespace detail {
+void __to_binary(bytes &res, const B &object) {
+    __to_binary(res, object.data);
+    __to_binary(res, object.next);
+}
+void __from_binary(bytes_iter &it, B &object, void *) {
+    __from_binary(it, object.data);
+    __from_binary(it, object.next);
+}
+Value __to_rapidjson(const B &object, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetObject();
+    v.AddMember("data", __to_rapidjson(object.data, allocator), allocator);
+    v.AddMember("next", __to_rapidjson(object.next, allocator), allocator);
+    return v;
+}
+}
+}
+
+
+
+E::__Tag E::__get_tag() const {
+    return static_cast<__Tag>(__data.index());
+}
+E::E(const __Data &data): __data(data) {}
+E::E(__Data &&data): __data(std::move(data)) {}
+E::E(): __data() {}
+E::E(const E &other): __data(other.__data) {}
+E::E(E &&other): __data(std::move(other.__data)) {}
+E &E::operator=(const E &other) {
+    switch (other.__get_tag()) {
+        case __Tag::AA:
+            __data.emplace<static_cast<std::size_t>(__Tag::AA)>(other.__get_value<__Tag::AA>());
+            break;
+        case __Tag::BB:
+            __data.emplace<static_cast<std::size_t>(__Tag::BB)>(other.__get_value<__Tag::BB>());
+            break;
+        default:
+            __data.emplace<0>();
+    }
+    return *this;
+}
+E &E::operator=(E &&other) {
+    switch (other.__get_tag()) {
+        case __Tag::AA:
+            __data.emplace<static_cast<std::size_t>(__Tag::AA)>(std::move(other.__get_value<__Tag::AA>()));
+            break;
+        case __Tag::BB:
+            __data.emplace<static_cast<std::size_t>(__Tag::BB)>(std::move(other.__get_value<__Tag::BB>()));
+            break;
+        default:
+            __data.emplace<0>();
+    }
+    return *this;
+}
+E &E::operator=(std::nullptr_t) {
+    __data.emplace<0>();
+    return *this;
+}
+E E::AA(A value) {
+    return E(__Data{std::in_place_index<static_cast<size_t>(__Tag::AA)>, value});
+}
+
+bool E::is_AA() const {
+    return __get_tag() == __Tag::AA;
+}
+
+const A &E::get_AA() const {
+    return __get_value<__Tag::AA>();
+}
+A &E::get_AA() {
+    return __get_value<__Tag::AA>();
+}
+
+E E::BB(B value) {
+    return E(__Data{std::in_place_index<static_cast<size_t>(__Tag::BB)>, value});
+}
+
+bool E::is_BB() const {
+    return __get_tag() == __Tag::BB;
+}
+
+const B &E::get_BB() const {
+    return __get_value<__Tag::BB>();
+}
+B &E::get_BB() {
+    return __get_value<__Tag::BB>();
+}
+
+const char *E::type_name() const {
+    switch (__get_tag()) {
+        case __Tag::AA:
+            return "AA";
+        case __Tag::BB:
+            return "BB";
+        default:
+            return "<undefined>";
+    }
+}
+bool E::operator==(const E &other) const {
+    return __data.index() == other.__data.index();
+}
+bool E::operator!=(const E &other) const {
+    return __data.index() != other.__data.index();
+}
+bool E::operator==(std::nullptr_t) const {
+    return __data.index() == 0;
+}
+bool E::operator!=(std::nullptr_t) const {
+    return __data.index() != 0;
+}
+namespace axm {
+namespace detail {
+void __to_binary(bytes &res, const E &object) {
+    __to_binary(res, (uint32_t)object.__data.index());
+    switch (object.__get_tag()) {
+        
+            case E::__Tag::AA:
+                __to_binary(res, object.__get_value<E::__Tag::AA>());
+                break;
+        
+        
+            case E::__Tag::BB:
+                __to_binary(res, object.__get_value<E::__Tag::BB>());
+                break;
+        
+        default:
+            break;
+    }
+}
+void __from_binary(bytes_iter &it, E &object, void *) {
+    uint32_t tag_id;
+    __from_binary(it, tag_id);
+    switch (static_cast<E::__Tag>(tag_id)) {
+        case E::__Tag::AA: {
+            
+                A value;
+                __from_binary(it, value);
+                object = E(E::__Data{std::in_place_index<static_cast<size_t>(E::__Tag::AA)>, std::move(value)});
+            
+                break;
+        }
+        case E::__Tag::BB: {
+            
+                B value;
+                __from_binary(it, value);
+                object = E(E::__Data{std::in_place_index<static_cast<size_t>(E::__Tag::BB)>, std::move(value)});
+            
+                break;
+        }
+        default:
+            object = E();
+            break;
+    }
+}
+Value __to_rapidjson(const E &object, Document::AllocatorType &allocator) {
+    Value v;
+    v.SetObject();
+    switch (object.__get_tag()) {
+        case E::__Tag::AA:
+            v.AddMember("AA",
+            
+                __to_rapidjson(object.__get_value<E::__Tag::AA>(), allocator)
+            
+            , allocator
+            );
+            break;
+        case E::__Tag::BB:
+            v.AddMember("BB",
+            
+                __to_rapidjson(object.__get_value<E::__Tag::BB>(), allocator)
+            
+            , allocator
+            );
+            break;
+        default:
+            break;
+    }
     return v;
 }
 }

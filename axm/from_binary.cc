@@ -43,7 +43,5 @@ void __var_from_binary(bytes_iter &it, int64_t &data) {
     __var_u_from_binary(it, tmp);
     data = (tmp & 1 ? ~(tmp >> 1) : tmp >> 1);
 }
-
 }  // namespace detail
-
 }  // namespace axm

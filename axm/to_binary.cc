@@ -10,9 +10,7 @@ namespace detail {
 void __to_binary(bytes &res, const std::string &data) {
     res.reserve(4 + data.size());
     __to_binary(res, (uint32_t)data.size());
-    for (const auto &i : data) {
-        __to_binary(res, i);
-    }
+    __container_to_binary(res, data.cbegin(), data.cend());
 }
 
 template <typename T>

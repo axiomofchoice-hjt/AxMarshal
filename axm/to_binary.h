@@ -10,7 +10,6 @@
 
 namespace axm {
 namespace detail {
-using bytes = std::vector<uint8_t>;
 template <size_t N>
 void __to_binary_le(bytes &res, const void *data) {
     res.reserve(N);
@@ -42,19 +41,22 @@ void __var_to_binary(bytes &, const int32_t &);
 void __var_to_binary(bytes &, const uint64_t &);
 void __var_to_binary(bytes &, const int64_t &);
 
+template <typename Iter>
+void __container_to_binary(bytes &res, Iter l, Iter r) {
+    for (Iter i = l; i != r; ++i) {
+        __to_binary(res, *i);
+    }
+}
+
 template <typename T>
 void __to_binary(bytes &res, const std::vector<T> &data) {
     __to_binary(res, (uint32_t)data.size());
-    for (const auto &i : data) {
-        __to_binary(res, i);
-    }
+    __container_to_binary(res, data.cbegin(), data.cend());
 }
 
 template <typename T, size_t Size>
 void __to_binary(bytes &res, const std::array<T, Size> &data) {
-    for (const auto &i : data) {
-        __to_binary(res, i);
-    }
+    __container_to_binary(res, data.cbegin(), data.cend());
 }
 
 template <typename T>

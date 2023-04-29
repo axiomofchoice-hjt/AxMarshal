@@ -1,5 +1,5 @@
 #pragma once
 
-#include "FromBinary.h"
-#include "Json.h"
-#include "ToBinary.h"
+#include "from_binary.h"
+#include "to_binary.h"
+#include "to_json.h"

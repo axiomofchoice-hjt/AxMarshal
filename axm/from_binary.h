@@ -44,11 +44,11 @@ void __container_from_binary(bytes_iter &it, Iter l, Iter r) {
     }
 }
 
+void __from_binary(bytes_iter &, std::string &);
 void __var_from_binary(bytes_iter &, uint32_t &);
 void __var_from_binary(bytes_iter &, int32_t &);
 void __var_from_binary(bytes_iter &, uint64_t &);
 void __var_from_binary(bytes_iter &, int64_t &);
-void __from_binary(bytes_iter &, std::string &);
 
 template <typename T>
 void __from_binary(bytes_iter &it, std::vector<T> &data) {

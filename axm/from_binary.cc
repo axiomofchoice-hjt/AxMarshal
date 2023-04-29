@@ -3,7 +3,7 @@
 namespace axm {
 namespace detail {
 
-void __from_binary(bytes_iter &it, std::string &data, void *) {
+void __from_binary(bytes_iter &it, std::string &data) {
     uint32_t size;
     __from_binary(it, size);
     data.resize(size);

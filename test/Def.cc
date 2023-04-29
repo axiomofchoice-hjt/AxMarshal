@@ -123,7 +123,7 @@ void __to_binary(bytes &res, const Calc &object) {
             break;
     }
 }
-void __from_binary(bytes_iter &it, Calc &object, void *) {
+void __from_binary(bytes_iter &it, Calc &object) {
     uint32_t tag_id;
     __from_binary(it, tag_id);
     switch (static_cast<Calc::__Tag>(tag_id)) {
@@ -300,7 +300,7 @@ void __to_binary(bytes &res, const Result &object) {
             break;
     }
 }
-void __from_binary(bytes_iter &it, Result &object, void *) {
+void __from_binary(bytes_iter &it, Result &object) {
     uint32_t tag_id;
     __from_binary(it, tag_id);
     switch (static_cast<Result::__Tag>(tag_id)) {
@@ -435,7 +435,7 @@ void __to_binary(bytes &res, const User &object) {
     __to_binary(res, object.follows);
     __to_binary(res, object.state);
 }
-void __from_binary(bytes_iter &it, User &object, void *) {
+void __from_binary(bytes_iter &it, User &object) {
     __from_binary(it, object.id);
     __from_binary(it, object.name);
     __from_binary(it, object.gender);
@@ -483,7 +483,7 @@ namespace detail {
 void __to_binary(bytes &res, const Array &object) {
     __to_binary(res, object.el);
 }
-void __from_binary(bytes_iter &it, Array &object, void *) {
+void __from_binary(bytes_iter &it, Array &object) {
     __from_binary(it, object.el);
 }
 Value __to_rapidjson(const Array &object, Document::AllocatorType &allocator) {
@@ -529,7 +529,7 @@ void __to_binary(bytes &res, const Linked &object) {
     __to_binary(res, object.data);
     __to_binary(res, object.next);
 }
-void __from_binary(bytes_iter &it, Linked &object, void *) {
+void __from_binary(bytes_iter &it, Linked &object) {
     __from_binary(it, object.data);
     __from_binary(it, object.next);
 }
@@ -577,7 +577,7 @@ void __to_binary(bytes &res, const A &object) {
     __to_binary(res, object.data);
     __to_binary(res, object.next);
 }
-void __from_binary(bytes_iter &it, A &object, void *) {
+void __from_binary(bytes_iter &it, A &object) {
     __from_binary(it, object.data);
     __from_binary(it, object.next);
 }
@@ -625,7 +625,7 @@ void __to_binary(bytes &res, const B &object) {
     __to_binary(res, object.data);
     __to_binary(res, object.next);
 }
-void __from_binary(bytes_iter &it, B &object, void *) {
+void __from_binary(bytes_iter &it, B &object) {
     __from_binary(it, object.data);
     __from_binary(it, object.next);
 }
@@ -750,7 +750,7 @@ void __to_binary(bytes &res, const E &object) {
             break;
     }
 }
-void __from_binary(bytes_iter &it, E &object, void *) {
+void __from_binary(bytes_iter &it, E &object) {
     uint32_t tag_id;
     __from_binary(it, tag_id);
     switch (static_cast<E::__Tag>(tag_id)) {

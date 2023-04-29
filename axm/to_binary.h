@@ -1,26 +1,41 @@
 #pragma once
 
 #include <array>
-#include <cstdint>
 #include <cstdio>
 #include <memory>
 #include <string>
 #include <variant>
-#include <vector>
+
+#include "defines.h"
 
 namespace axm {
 namespace detail {
 using bytes = std::vector<uint8_t>;
-void __to_binary(bytes &, const bool &);
-void __to_binary(bytes &, const char &);
-void __to_binary(bytes &, const uint8_t &);
-void __to_binary(bytes &, const uint32_t &);
-void __to_binary(bytes &, const uint64_t &);
-void __to_binary(bytes &, const int8_t &);
-void __to_binary(bytes &, const int32_t &);
-void __to_binary(bytes &, const int64_t &);
-void __to_binary(bytes &, const float &);
-void __to_binary(bytes &, const double &);
+template <size_t N>
+void __to_binary_le(bytes &res, const void *data) {
+    res.reserve(N);
+    for (size_t i = 0; i < N; i++) {
+        res.push_back(((const uint8_t *)data)[i]);
+    }
+}
+
+template <size_t N>
+void __to_binary_be(bytes &res, const void *data) {
+    res.reserve(N);
+    for (size_t i = N - 1; i != SIZE_MAX; i--) {
+        res.push_back(((const uint8_t *)data)[i]);
+    }
+}
+
+template <is_number T>
+void __to_binary(bytes &res, const T &data) {
+    if constexpr (std::endian::native == std::endian::little) {
+        __to_binary_le<sizeof(T)>(res, &data);
+    } else {
+        __to_binary_be<sizeof(T)>(res, &data);
+    }
+}
+
 void __to_binary(bytes &, const std::string &);
 void __var_to_binary(bytes &, const uint32_t &);
 void __var_to_binary(bytes &, const int32_t &);

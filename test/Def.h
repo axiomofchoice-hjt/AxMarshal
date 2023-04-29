@@ -21,7 +21,7 @@ class E;
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const Calc &);
-void __from_binary(std::vector<uint8_t>::const_iterator &, Calc &, void * = nullptr);
+void __from_binary(std::vector<uint8_t>::const_iterator &, Calc &);
 Value __to_rapidjson(const Calc &, Document::AllocatorType &);
 }
 }
@@ -83,7 +83,7 @@ class Calc {
     bool operator==(std::nullptr_t) const;
     bool operator!=(std::nullptr_t) const;
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const Calc &);
-    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, Calc &, void *);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, Calc &);
     friend rapidjson::Value axm::detail::__to_rapidjson(const Calc &, rapidjson::Document::AllocatorType &);
 };
 
@@ -91,7 +91,7 @@ class Calc {
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const Result &);
-void __from_binary(std::vector<uint8_t>::const_iterator &, Result &, void * = nullptr);
+void __from_binary(std::vector<uint8_t>::const_iterator &, Result &);
 Value __to_rapidjson(const Result &, Document::AllocatorType &);
 }
 }
@@ -144,7 +144,7 @@ class Result {
     bool operator==(std::nullptr_t) const;
     bool operator!=(std::nullptr_t) const;
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const Result &);
-    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, Result &, void *);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, Result &);
     friend rapidjson::Value axm::detail::__to_rapidjson(const Result &, rapidjson::Document::AllocatorType &);
 };
 
@@ -152,7 +152,7 @@ class Result {
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const User &);
-void __from_binary(std::vector<uint8_t>::const_iterator &, User &, void * = nullptr);
+void __from_binary(std::vector<uint8_t>::const_iterator &, User &);
 Value __to_rapidjson(const User &, Document::AllocatorType &);
 }
 }
@@ -185,7 +185,7 @@ class User {
         Result state;
     
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const User &);
-    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, User &, void *);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, User &);
     friend rapidjson::Value axm::detail::__to_rapidjson(const User &, rapidjson::Document::AllocatorType &);
 };
 
@@ -193,7 +193,7 @@ class User {
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const Array &);
-void __from_binary(std::vector<uint8_t>::const_iterator &, Array &, void * = nullptr);
+void __from_binary(std::vector<uint8_t>::const_iterator &, Array &);
 Value __to_rapidjson(const Array &, Document::AllocatorType &);
 }
 }
@@ -208,7 +208,7 @@ class Array {
         std::array<int, 4> el;
     
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const Array &);
-    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, Array &, void *);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, Array &);
     friend rapidjson::Value axm::detail::__to_rapidjson(const Array &, rapidjson::Document::AllocatorType &);
 };
 
@@ -216,7 +216,7 @@ class Array {
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const Linked &);
-void __from_binary(std::vector<uint8_t>::const_iterator &, Linked &, void * = nullptr);
+void __from_binary(std::vector<uint8_t>::const_iterator &, Linked &);
 Value __to_rapidjson(const Linked &, Document::AllocatorType &);
 }
 }
@@ -234,7 +234,7 @@ class Linked {
         std::unique_ptr<Linked> next;
     
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const Linked &);
-    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, Linked &, void *);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, Linked &);
     friend rapidjson::Value axm::detail::__to_rapidjson(const Linked &, rapidjson::Document::AllocatorType &);
 };
 
@@ -242,7 +242,7 @@ class Linked {
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const A &);
-void __from_binary(std::vector<uint8_t>::const_iterator &, A &, void * = nullptr);
+void __from_binary(std::vector<uint8_t>::const_iterator &, A &);
 Value __to_rapidjson(const A &, Document::AllocatorType &);
 }
 }
@@ -260,7 +260,7 @@ class A {
         std::unique_ptr<B> next;
     
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const A &);
-    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, A &, void *);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, A &);
     friend rapidjson::Value axm::detail::__to_rapidjson(const A &, rapidjson::Document::AllocatorType &);
 };
 
@@ -268,7 +268,7 @@ class A {
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const B &);
-void __from_binary(std::vector<uint8_t>::const_iterator &, B &, void * = nullptr);
+void __from_binary(std::vector<uint8_t>::const_iterator &, B &);
 Value __to_rapidjson(const B &, Document::AllocatorType &);
 }
 }
@@ -286,7 +286,7 @@ class B {
         std::unique_ptr<A> next;
     
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const B &);
-    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, B &, void *);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, B &);
     friend rapidjson::Value axm::detail::__to_rapidjson(const B &, rapidjson::Document::AllocatorType &);
 };
 
@@ -294,7 +294,7 @@ class B {
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const E &);
-void __from_binary(std::vector<uint8_t>::const_iterator &, E &, void * = nullptr);
+void __from_binary(std::vector<uint8_t>::const_iterator &, E &);
 Value __to_rapidjson(const E &, Document::AllocatorType &);
 }
 }
@@ -350,7 +350,7 @@ class E {
     bool operator==(std::nullptr_t) const;
     bool operator!=(std::nullptr_t) const;
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const E &);
-    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, E &, void *);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, E &);
     friend rapidjson::Value axm::detail::__to_rapidjson(const E &, rapidjson::Document::AllocatorType &);
 };
 

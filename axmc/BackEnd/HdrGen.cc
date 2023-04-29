@@ -25,7 +25,7 @@ static auto block_template_string = R"__template__(
 namespace axm {
 namespace detail {
 void __to_binary(std::vector<uint8_t> &, const {{ name }} &);
-void __from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &, void * = nullptr);
+void __from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &);
 Value __to_rapidjson(const {{ name }} &, Document::AllocatorType &);
 }
 }
@@ -78,7 +78,7 @@ class {{ name }} {
     bool operator==(std::nullptr_t) const;
     bool operator!=(std::nullptr_t) const;
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const {{ name }} &);
-    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &, void *);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &);
     friend rapidjson::Value axm::detail::__to_rapidjson(const {{ name }} &, rapidjson::Document::AllocatorType &);
 };
 {% else if type == "struct" %}
@@ -100,7 +100,7 @@ class {{ name }} {
     {% endif %}
 ## endfor
     friend void axm::detail::__to_binary(std::vector<uint8_t> &, const {{ name }} &);
-    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &, void *);
+    friend void axm::detail::__from_binary(std::vector<uint8_t>::const_iterator &, {{ name }} &);
     friend rapidjson::Value axm::detail::__to_rapidjson(const {{ name }} &, rapidjson::Document::AllocatorType &);
 };
 {% endif %}

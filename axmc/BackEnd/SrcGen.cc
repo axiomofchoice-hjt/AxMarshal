@@ -102,7 +102,7 @@ void __to_binary(bytes &res, const {{ name }} &object) {
             break;
     }
 }
-void __from_binary(bytes_iter &it, {{ name }} &object, void *) {
+void __from_binary(bytes_iter &it, {{ name }} &object) {
     uint32_t tag_id;
     __from_binary(it, tag_id);
     switch (static_cast<{{ name }}::__Tag>(tag_id)) {
@@ -181,7 +181,7 @@ void __to_binary(bytes &res, const {{ name }} &object) {
     __{% if i.is_var %}var_{% endif %}to_binary(res, object.{{ i.key }});
 ## endfor
 }
-void __from_binary(bytes_iter &it, {{ name }} &object, void *) {
+void __from_binary(bytes_iter &it, {{ name }} &object) {
 ## for i in elements
     __{% if i.is_var %}var_{% endif %}from_binary(it, object.{{ i.key }});
 ## endfor

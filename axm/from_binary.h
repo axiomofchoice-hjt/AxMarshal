@@ -1,18 +1,17 @@
 #pragma once
 
 #include <array>
-#include <cstdint>
 #include <cstdio>
 #include <memory>
 #include <string>
 #include <variant>
-#include <vector>
+
+#include "defines.h"
 
 namespace axm {
 
 namespace detail {
-using bytes = std::vector<uint8_t>;
-using bytes_iter = std::vector<uint8_t>::const_iterator;
+
 template <size_t N>
 void __from_binary_le(bytes_iter &it, void *data) {
     for (size_t i = 0; i < N; i++) {
@@ -29,17 +28,8 @@ void __from_binary_be(bytes_iter &it, void *data) {
     }
 }
 
-template <typename T>
-void __from_binary(
-    bytes_iter &it, T &data,
-    typename std::enable_if<
-        std::is_same<T, bool>::value || std::is_same<T, char>::value ||
-        std::is_same<T, uint8_t>::value || std::is_same<T, int8_t>::value ||
-        std::is_same<T, uint16_t>::value || std::is_same<T, int16_t>::value ||
-        std::is_same<T, uint32_t>::value || std::is_same<T, int32_t>::value ||
-        std::is_same<T, uint64_t>::value || std::is_same<T, int64_t>::value ||
-        std::is_same<T, float>::value || std::is_same<T, double>::value>::type
-        * = nullptr) {
+template <is_number T>
+void __from_binary(bytes_iter &it, T &data) {
     if constexpr (std::endian::native == std::endian::little) {
         __from_binary_le<sizeof(T)>(it, &data);
     } else {
@@ -58,10 +48,10 @@ void __var_from_binary(bytes_iter &, uint32_t &);
 void __var_from_binary(bytes_iter &, int32_t &);
 void __var_from_binary(bytes_iter &, uint64_t &);
 void __var_from_binary(bytes_iter &, int64_t &);
-void __from_binary(bytes_iter &, std::string &, void * = nullptr);
+void __from_binary(bytes_iter &, std::string &);
 
 template <typename T>
-void __from_binary(bytes_iter &it, std::vector<T> &data, void * = nullptr) {
+void __from_binary(bytes_iter &it, std::vector<T> &data) {
     uint32_t size;
     __from_binary(it, size);
     data.resize(size);
@@ -69,18 +59,17 @@ void __from_binary(bytes_iter &it, std::vector<T> &data, void * = nullptr) {
 }
 
 template <typename T, size_t Size>
-void __from_binary(bytes_iter &it, std::array<T, Size> &data,
-                   void * = nullptr) {
+void __from_binary(bytes_iter &it, std::array<T, Size> &data) {
     __container_from_binary(it, data.begin(), data.end());
 }
 
 template <typename T>
-void __from_binary(bytes_iter &it, std::unique_ptr<T> &data, void * = nullptr) {
+void __from_binary(bytes_iter &it, std::unique_ptr<T> &data) {
     bool tmp;
     __from_binary(it, tmp);
     if (tmp) {
         data = std::make_unique<T>();
-        void __from_binary(bytes_iter &, T &, void * = nullptr);
+        void __from_binary(bytes_iter &, T &);
         __from_binary(it, *data);
     } else {
         data = nullptr;
@@ -91,7 +80,7 @@ template <typename T>
 T from_binary(const bytes &bin) {
     T res;
     bytes_iter tmp_iter = bin.cbegin();
-    void __from_binary(bytes_iter &, T &, void * = nullptr);
+    void __from_binary(bytes_iter &, T &);
     __from_binary(tmp_iter, res);
     if (tmp_iter != bin.cend()) {
         printf("from_binary fail: %zd\n", tmp_iter - bin.cend());
